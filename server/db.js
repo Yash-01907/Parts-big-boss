@@ -12,8 +12,10 @@ export const pool = new Pool({
 
 export async function dbconnect() {
     try {
-        await pool.connect();
-        console.log("Connected to the database successfully.");
+        const client = await pool.connect();
+        const res = await client.query('SELECT version()');
+        console.log("Connected to:", res.rows[0].version); // This will tell you the answer!
+        client.release();
     } catch (err) {
         console.error("Database connection error:", err);
     }
