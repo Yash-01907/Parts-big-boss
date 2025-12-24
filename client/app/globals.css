@@ -1,21 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Light shade of red that works on both black and white */
+  --primary-red: #b81212;
+  --primary-red-dark: #ee5a52;
+  --primary-red-light: #ff8787;
+
+  /* Black and white */
+  --primary-black: #0a0a0a;
+  --primary-white: #ffffff;
+
+  /* Dark theme (black background) */
+  --background-dark: #0a0a0a;
+  --foreground-dark: #ffffff;
+  --accent-dark: #ff6b6b;
+
+  /* Light theme (white background) */
+  --background-light: #ffffff;
+  --foreground-light: #0a0a0a;
+  --accent-light: #ff6b6b;
+
+  /* Default to dark theme */
+  --background: var(--background-dark);
+  --foreground: var(--foreground-dark);
+  --accent: var(--accent-dark);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-sans);
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: var(--background-light);
+    --foreground: var(--foreground-light);
+    --accent: var(--accent-light);
   }
 }
 
@@ -23,4 +45,84 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Link styles with red accent */
+a {
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+}
+
+/* Button styles with red accent */
+button {
+  background-color: var(--accent);
+  color: var(--background);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: var(--primary-red-dark);
+}
+
+button:active {
+  background-color: var(--primary-red);
+}
+
+/* Heading styles */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--accent);
+  margin-bottom: 0.5em;
+}
+
+/* Input and form elements */
+input,
+textarea,
+select {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 2px solid var(--accent);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-red-dark);
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+}
+
+/* Code blocks */
+code {
+  background-color: var(--foreground);
+  color: var(--accent);
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: var(--font-geist-mono);
+}
+
+pre {
+  background-color: var(--foreground);
+  color: var(--accent);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  border: 2px solid var(--accent);
 }
