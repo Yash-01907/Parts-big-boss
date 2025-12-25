@@ -1,84 +1,120 @@
 @import "tailwindcss";
 
 :root {
-  /* Light shade of red that works on both black and white */
-  --primary-red: #b81212;
-  --primary-red-dark: #ee5a52;
-  --primary-red-light: #ff8787;
+  /* ================================
+     CORE BRAND COLORS
+     ================================ */
+  --base-dark: #3a2525;       /* warm near-black */
+  --brand-red: #9e2a3a;       /* primary automotive red */
+  --brand-red-hot: #ff0000;   /* high-energy accent */
+  --brand-navy: #000080;      /* deep navy */
 
-  /* Black and white */
-  --primary-black: #0a0a0a;
-  --primary-white: #ffffff;
+  /* ================================
+     DERIVED SHADES
+     ================================ */
+  --base-dark-soft: #2f1d1d;
+  --base-dark-hover: #463030;
 
-  /* Dark theme (black background) */
-  --background-dark: #0a0a0a;
-  --foreground-dark: #ffffff;
-  --accent-dark: #ff6b6b;
+  --red-hover: #b83344;
+  --red-soft: rgba(158, 42, 58, 0.25);
 
-  /* Light theme (white background) */
-  --background-light: #ffffff;
-  --foreground-light: #0a0a0a;
-  --accent-light: #ff6b6b;
+  --navy-soft: rgba(0, 0, 128, 0.25);
 
-  /* Default to dark theme */
-  --background: var(--background-dark);
-  --foreground: var(--foreground-dark);
-  --accent: var(--accent-dark);
+  /* ================================
+     TEXT COLORS
+     ================================ */
+  --text-primary: #f4f4f4;
+  --text-secondary: #c9c1c1;
+  --text-muted: #9a8f8f;
+
+  /* ================================
+     SEMANTIC TOKENS
+     ================================ */
+  --background: var(--base-dark);
+  --foreground: var(--text-primary);
+  --surface: var(--base-dark-soft);
+  --surface-hover: var(--base-dark-hover);
+  --border: rgba(255, 255, 255, 0.08);
+
+  --accent: var(--brand-red);
+  --accent-hover: var(--red-hover);
+  --accent-soft: var(--red-soft);
+
+  --info: var(--brand-navy);
+  --info-soft: var(--navy-soft);
+
+  --danger: var(--brand-red-hot);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
-  --font-sans: var(--font-sans);
+  --color-surface: var(--surface);
+  --color-border: var(--border);
+  --color-info: var(--info);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: var(--background-light);
-    --foreground: var(--foreground-light);
-    --accent: var(--accent-light);
-  }
-}
+/* ================================
+   GLOBAL STYLES
+   ================================ */
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Link styles with red accent */
+/* ================================
+   LINKS
+   ================================ */
+
 a {
-  color: var(--accent);
+  color: var(--info);
   text-decoration: none;
-  transition: opacity 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 a:hover {
-  opacity: 0.8;
+  color: var(--accent);
 }
 
-/* Button styles with red accent */
+/* ================================
+   BUTTONS
+   ================================ */
+
 button {
   background-color: var(--accent);
-  color: var(--background);
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #ffffff;
+  border-radius: 10px;
+  padding: 10px 18px;
   font-weight: 600;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
 button:hover {
-  background-color: var(--primary-red-dark);
+  background-color: var(--accent-hover);
 }
 
 button:active {
-  background-color: var(--primary-red);
+  transform: scale(0.97);
 }
 
-/* Heading styles */
+/* Secondary / Info Button */
+button.secondary {
+  background-color: transparent;
+  color: var(--info);
+  border: 1px solid var(--info);
+}
+
+button.secondary:hover {
+  background-color: var(--info-soft);
+}
+
+/* ================================
+   HEADINGS
+   ================================ */
+
 h1,
 h2,
 h3,
@@ -89,40 +125,57 @@ h6 {
   margin-bottom: 0.5em;
 }
 
-/* Input and form elements */
+/* ================================
+   FORMS & INPUTS
+   ================================ */
+
 input,
 textarea,
 select {
-  background-color: var(--background);
-  color: var(--foreground);
-  border: 2px solid var(--accent);
-  padding: 8px 12px;
-  border-radius: 4px;
+  background-color: var(--surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 14px;
   font-size: 1rem;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
 }
 
 input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--primary-red-dark);
-  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
-/* Code blocks */
+/* Navy focus utility (optional) */
+input.info:focus {
+  border-color: var(--info);
+  box-shadow: 0 0 0 3px var(--info-soft);
+}
+
+/* ================================
+   CODE BLOCKS
+   ================================ */
+
 code {
-  background-color: var(--foreground);
-  color: var(--accent);
+  background-color: var(--surface-hover);
+  color: var(--brand-red-hot);
   padding: 2px 6px;
-  border-radius: 3px;
-  font-family: var(--font-geist-mono);
+  border-radius: 6px;
+  font-family: var(--font-geist-mono, monospace);
 }
 
 pre {
-  background-color: var(--foreground);
-  color: var(--accent);
+  background-color: var(--surface);
+  color: var(--brand-red-hot);
   padding: 16px;
-  border-radius: 8px;
+  border-radius: 14px;
   overflow-x: auto;
-  border: 2px solid var(--accent);
+  border: 1px solid var(--border);
 }
