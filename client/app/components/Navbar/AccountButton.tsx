@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { User, LogOut } from "lucide-react";
+import { User, LogOut, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function AccountButton() {
@@ -86,7 +86,6 @@ export default function AccountButton() {
         className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-offset-2"
         style={{
           color: "var(--primary-white)",
-          focusRingColor: "var(--primary-red)",
         }}
         aria-label="Account menu"
         aria-expanded={isOpen}
@@ -159,20 +158,7 @@ export default function AccountButton() {
               }
               onClick={() => setIsOpen(false)}
             >
-              <svg
-                size={16}
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                style={{ color: "var(--text-muted)" }}
-              >
-                <circle cx="9" cy="21" r="1" />
-                <circle cx="20" cy="21" r="1" />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
+              <ShoppingBag size={16} style={{ color: "var(--text-muted)" }} />
               Orders
             </Link>
 

@@ -3,11 +3,19 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
-import NavLinks from "./Navlinks";
+
 import SearchButton from "../Search/SearchButton";
 import CartButton from "./CartButton";
 import AccountButton from "./AccountButton";
 import MobileMenu from "./MobileMenu";
+import NavItem from "./NavItem";
+
+// example imports – adjust paths as needed
+import {
+  partsMegaMenu,
+  categoriesMegaMenu,
+  brandsMegaMenu,
+} from "../Data/megaMenus";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,7 +23,7 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 8);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -24,51 +32,64 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
           ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
           : "bg-white border-b border-gray-100"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* ================= LOGO ================= */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <div className="w-8 h-8 bg-gray-900 rounded-md flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--accent)] text-white font-bold">
+              P
             </div>
-            <span className="text-gray-900 font-semibold hidden sm:inline">
+            <span className="hidden sm:inline font-semibold text-var(--base-dark) text-2xl">
               PartsBigBoss
             </span>
           </Link>
 
-          {/* Center Navigation - Desktop */}
-          <NavLinks />
+          {/* ================= DESKTOP NAV ================= */}
+          <div className="hidden lg:flex items-center gap-8">
+            <NavItem label="Parts" megaMenuData={partsMegaMenu} />
+            <NavItem label="Categories" megaMenuData={categoriesMegaMenu} />
+            <NavItem label="Brands" megaMenuData={brandsMegaMenu} />
+          </div>
 
-          {/* Right Actions */}
-          <div className="flex items-center gap-4">
-            {/* Search Button */}
-            <SearchButton />
+          {/* ================= ACTIONS ================= */}
+          <div className="flex items-center gap-3">
+            {/* Desktop actions */}
+            <div className="hidden lg:flex items-center gap-3">
+              <SearchButton />
+              <AccountButton />
+              <CartButton />
+            </div>
 
-            {/* Cart Button */}
-            <CartButton />
-
-            {/* Account Button */}
-            <AccountButton />
-
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-colors duration-200"
-              aria-label="Open menu"
-            >
-              <Menu size={20} />
-            </button>
+            {/* Mobile actions */}
+            <div className="flex lg:hidden items-center gap-2">
+              <SearchButton />
+              <CartButton />
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="
+                  inline-flex items-center justify-center
+                  rounded-lg p-2
+                  text-[var(--text-muted)]
+                  transition-colors
+                  hover:text-[var(--foreground)]
+                  hover:bg-[var(--surface-hover)]
+                "
+                aria-label="Open menu"
+              >
+                <Menu size={20} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile Menu Overlay */}
+      {/* ================= MOBILE MENU ================= */}
       <MobileMenu
         isOpen={isMobileMenuOpen}
         onClose={() => setIsMobileMenuOpen(false)}
