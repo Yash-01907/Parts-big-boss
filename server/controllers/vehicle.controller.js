@@ -12,7 +12,7 @@ const getCompanies = asyncHandler(async (req, res) => {
   const result = await pool.query(
     "SELECT id,name FROM vehicle_makes ORDER BY name ASC"
   );
-  await redisClient.set("companies", JSON.stringify(result.rows));
+  await redisClient.set("companies", JSON.stringify(result.rows),"EX",86400);
   return res.json(result.rows);
 });
 
@@ -30,7 +30,7 @@ const getModels = asyncHandler(async (req, res) => {
     "SELECT * FROM vehicle_models WHERE make_id = $1 ORDER BY name ASC",
     [make_id]
   );
-  await redisClient.set(`models:${make_id}`, JSON.stringify(result.rows));
+  await redisClient.set(`models:${make_id}`, JSON.stringify(result.rows),"EX",86400);
   return res.json(result.rows);
 });
 
@@ -49,7 +49,7 @@ const getYears = asyncHandler(async (req, res) => {
             ORDER BY year DESC`;
   const result = await pool.query(query, [model_id]);
   const years = result.rows.map((row) => row.year);
-  await redisClient.set(`years:${model_id}`, JSON.stringify(years));
+  await redisClient.set(`years:${model_id}`, JSON.stringify(years),"EX",86400);
   res.json(years);
 });
 
