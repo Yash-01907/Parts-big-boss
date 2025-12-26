@@ -1,27 +1,28 @@
-import { Client } from 'pg';
-import fs from 'fs';
-import path from 'path';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
+import { configureMeili, index, meiliClient } from "../utils/meiliClient.js";
+import { Client } from "pg";
+import fs from "fs";
+import path from "path";
+import dotenv from "dotenv";
+import { fileURLToPath } from "url";
+import seedVehicles from "./seed.js";
+import syncMeili from "./syncmeili.js";
 dotenv.config();
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
 const client = new Client({
-    connectionString: process.env.DB_STRING,
+  connectionString: process.env.DB_STRING,
 });
 
 async function buildDatabase() {
   try {
     await client.connect();
-    console.log('🔌 Connected to Database...');
+    console.log("🔌 Connected to Database...");
 
     // 1. DROP EVERYTHING (Clean Slate)
     // We use CASCADE to delete tables that depend on each other
-    console.log('🗑️  Dropping old tables...');
+    console.log("🗑️  Dropping old tables...");
     await client.query(`
       DROP TABLE IF EXISTS product_vehicle_fitment CASCADE;
       DROP TABLE IF EXISTS products CASCADE;
@@ -32,15 +33,27 @@ async function buildDatabase() {
     `);
 
     // 2. READ & EXECUTE SCHEMA
-    const sqlPath = path.join(__dirname, 'schema.sql');
-    const sql = fs.readFileSync(sqlPath, 'utf8');
+    const sqlPath = path.join(__dirname, "schema.sql");
+    const sql = fs.readFileSync(sqlPath, "utf8");
 
-    console.log('🏗️  Running Schema Migration...');
+    console.log("🏗️  Running Schema Migration...");
     await client.query(sql);
-    
-    console.log('✅ Database Structure Updated Successfully!');
+
+    console.log("✅ Database Structure Updated Successfully!");
+    console.log("MEILI_HOST:", process.env.MEILI_HOST);
+
+    await seedVehicles();
+    await meiliClient.deleteIndex("products"); // or deleteAllDocuments
+    await configureMeili(); // searchable + filterable
+    const some = await meiliClient.getIndexes()
+    console.log(some)
+    await syncMeili();
+  
+
+    const some2 = await index.search("Pre")
+    console.log(some2)
   } catch (err) {
-    console.error('❌ Error:', err);
+    console.error("❌ Error:", err);
   } finally {
     await client.end();
   }

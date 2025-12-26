@@ -182,9 +182,7 @@ async function seedVehicles() {
     console.log("🎉 FULL VEHICLE + PRODUCT SEED COMPLETE");
   } catch (err) {
     console.error("❌ Seed failed:", err);
-  } finally {
-    await pool.end();
   }
 }
 
-seedVehicles();
+export default seedVehicles;
