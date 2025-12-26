@@ -110,14 +110,13 @@ export default function NavItem({
       onMouseLeave={handleMouseLeave}
     >
       {/* NAV BUTTON */}
-      <button
+      <div
         className="
     relative flex items-center gap-1 py-2 px-3
     bg-transparent
     text-sm font-medium
-    text-[var(--text-secondary)]
+    text-[var(--base-dark)]
     transition-colors duration-200
-    hover:text-[var(--foreground)]
     focus:outline-none
   "
         onClick={() => setOpen(!open)}
@@ -148,7 +147,7 @@ export default function NavItem({
             open ? "rotate-180" : ""
           }`}
         />
-      </button>
+      </div>
 
       {/* MEGA MENU */}
       {open && (

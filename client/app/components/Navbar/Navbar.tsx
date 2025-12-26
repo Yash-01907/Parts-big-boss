@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Menu } from "lucide-react";
 
-import SearchButton from "../Search/SearchButton";
+import SearchBar from "./SearchBar";
 import CartButton from "./CartButton";
 import AccountButton from "./AccountButton";
 import MobileMenu from "./MobileMenu";
@@ -18,8 +18,8 @@ import {
 } from "../Data/megaMenus";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState<boolean>(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +32,7 @@ export default function Navbar() {
 
   return (
     <nav
-       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
           ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
           : "bg-white border-b border-gray-100"
@@ -51,7 +51,7 @@ export default function Navbar() {
           </Link>
 
           {/* ================= DESKTOP NAV ================= */}
-          <div className="hidden lg:flex items-center gap-8">
+          <div className="hidden lg:flex items-center gap-8 flex-1 justify-center">
             <NavItem label="Parts" megaMenuData={partsMegaMenu} />
             <NavItem label="Categories" megaMenuData={categoriesMegaMenu} />
             <NavItem label="Brands" megaMenuData={brandsMegaMenu} />
@@ -61,14 +61,14 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             {/* Desktop actions */}
             <div className="hidden lg:flex items-center gap-3">
-              <SearchButton />
+              <SearchBar />
               <AccountButton />
               <CartButton />
             </div>
 
             {/* Mobile actions */}
             <div className="flex lg:hidden items-center gap-2">
-              <SearchButton />
+              <SearchBar />
               <CartButton />
               <button
                 onClick={() => setIsMobileMenuOpen(true)}

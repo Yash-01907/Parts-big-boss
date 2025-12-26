@@ -62,7 +62,7 @@ export default function AccountButton() {
 
   if (!isAuthenticated) {
     return (
-      <button
+      <div
         onClick={handleLoginClick}
         className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group"
         style={{
@@ -74,7 +74,7 @@ export default function AccountButton() {
           size={20}
           className="transition-transform duration-200 group-hover:scale-110"
         />
-      </button>
+      </div>
     );
   }
 
