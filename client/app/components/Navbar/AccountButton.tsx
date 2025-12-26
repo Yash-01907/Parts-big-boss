@@ -64,15 +64,12 @@ export default function AccountButton() {
     return (
       <div
         onClick={handleLoginClick}
-        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group"
-        style={{
-          color: "var(--primary-white)",
-        }}
+        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group text-black cursor-pointer hover:bg-[var(--surface-hover)]"
         aria-label="Sign in"
       >
         <User
           size={20}
-          className="transition-transform duration-200 group-hover:scale-110"
+          className="transition-transform duration-200 group-hover:scale-110 "
         />
       </div>
     );

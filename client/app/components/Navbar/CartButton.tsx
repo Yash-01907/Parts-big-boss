@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
 
 export default function CartButton() {
-  const cartCount = 0; // This can be replaced with actual cart state/context
+  const cartCount = 3; // This can be replaced with actual cart state/context
 
   return (
     <Link
