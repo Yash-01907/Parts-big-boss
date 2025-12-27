@@ -74,7 +74,44 @@ CREATE TABLE IF NOT EXISTS product_vehicle_fitment (
 );
 
 -- ==========================================
--- 5. INDEXES (Speed Optimization)
+-- 5. USERS & AUTHENTICATION
+-- ==========================================
+
+-- 1. The Base User Table (Common to Everyone)
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    
+    -- Common Fields
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    
+    -- Role Management (Simple String Check is enough for now)
+    role TEXT NOT NULL DEFAULT 'customer', -- 'customer', 'dealer', 'admin'
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 2. The Dealer Profile (Extension Table)
+-- Only exists if role = 'dealer'
+CREATE TABLE IF NOT EXISTS dealers (
+    user_id BIGINT PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    
+    -- Dealer Specific Fields
+    company_name TEXT NOT NULL,
+    vat_number TEXT UNIQUE,
+    company_address TEXT,
+    company_city TEXT,
+    
+    -- Approval Status (Dealers often need manual approval)
+    is_verified BOOLEAN DEFAULT FALSE
+);
+
+-- ==========================================
+-- 6. INDEXES (Speed Optimization)
 -- ==========================================
 -- Search Indexes for the Dropdowns
 CREATE INDEX IF NOT EXISTS idx_models_make ON vehicle_models(make_id);
@@ -87,3 +124,6 @@ CREATE INDEX IF NOT EXISTS idx_fitment_variant ON product_vehicle_fitment(vehicl
 -- Product Search Indexes
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(category_id);
+
+-- User search Index for fast lookups
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
