@@ -1,7 +1,62 @@
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 import asyncHandler from "../utils/asyncHandler.js";
 import { pool } from "../db/db.js";
+import redisClient from "../db/redisClient.js";
 import AppError from "../utils/appError.js";
-import bcrypt from "bcrypt";
+import { 
+  generateAccessToken, 
+  generateRefreshToken 
+} from "../utils/generateToken.js"; 
+import { cookieOptions } from "../utils/cookieOptions.js";
+
+
+const sendTokenResponse = async (user, statusCode, res) => {
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  const sessionData = {
+    id: user.id,
+    email: user.email,
+    role: user.role,
+    is_verified: user.is_verified,
+  };
+  
+  await redisClient.set(
+    `session:${user.id}`,
+    JSON.stringify(sessionData),
+    "EX",
+    3600 // 1 Hour
+  );
+
+  await redisClient.set(
+    `refresh_token:${refreshToken}`,
+    user.id.toString(),
+    "EX",
+    604800 // 7 Days (Must match token expiry)
+  );
+
+  res.cookie("_access", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 }); // 15 mins
+  res.cookie("_refresh", refreshToken, cookieOptions);
+
+  res.status(statusCode).json({
+    status: "success",
+    accessToken,
+    data: {
+      id: user.id,
+      email: user.email,
+      first_name: user.first_name,
+      last_name: user.last_name,
+      role: user.role,
+      phone_number: user.phone_number,
+      dealer_profile: user.dealer_profile || null
+    },
+  });
+};
+
+
+
+
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { 
@@ -9,83 +64,72 @@ export const registerUser = asyncHandler(async (req, res) => {
     company_name, vat_number, company_address, company_city
   } = req.body;
 
-  // 1. Basic Validation
+  // 1. Validation
   if (!email || !phone_number || !first_name || !last_name || !password || !role) {
     throw new AppError("All common fields are required", 400);
   }
 
-  // 2. Validate Role
   const validRoles = ['customer', 'dealer'];
   if (!validRoles.includes(role)) {
     throw new AppError("Invalid role specified", 400);
   }
 
-  // 3. Dealer Validation (Fail fast before touching DB)
   if (role === "dealer") {
     if (!company_name || !vat_number || !company_address || !company_city) {
       throw new AppError("All dealer fields are required", 400);
     }
   }
 
-  // 4. Start Transaction
-  // We need a specific 'client' from the pool to ensure queries run on the same connection
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN'); // <--- Start Atomic Block
+    await client.query('BEGIN'); // Start Transaction
 
-    // A. Check if user exists (Optional, but good for custom error messages)
+    // 2. Check Exists
     const userCheck = await client.query("SELECT id FROM users WHERE email = $1", [email]);
     if (userCheck.rows.length > 0) {
       throw new AppError("Email already registered", 400);
     }
 
-    // B. Hash Password
+    // 3. Create User
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // C. Insert User
     const userQuery = `
       INSERT INTO users (email, phone_number, first_name, last_name, password_hash, role) 
       VALUES ($1, $2, $3, $4, $5, $6) 
-      RETURNING id, email, first_name, last_name, role, created_at`; 
-      // ^ NOTE: We do NOT return password_hash here
+      RETURNING id, email, first_name, last_name, role, phone_number, is_verified, created_at`; 
     
-    const userValues = [email, phone_number, first_name, last_name, hashedPassword, role];
-    const userResult = await client.query(userQuery, userValues);
+    const userResult = await client.query(userQuery, [
+      email, phone_number, first_name, last_name, hashedPassword, role
+    ]);
     const newUser = userResult.rows[0];
 
-    // D. Insert Dealer Profile (if applicable)
+    // 4. Create Dealer Profile (if needed)
     if (role === "dealer") {
       const dealerQuery = `
         INSERT INTO dealers (user_id, company_name, vat_number, company_address, company_city) 
         VALUES ($1, $2, $3, $4, $5) 
         RETURNING *`;
       
-      const dealerValues = [newUser.id, company_name, vat_number, company_address, company_city];
-      const dealerResult = await client.query(dealerQuery, dealerValues);
-      
-      // Attach dealer info to response
+      const dealerResult = await client.query(dealerQuery, [
+        newUser.id, company_name, vat_number, company_address, company_city
+      ]);
       newUser.dealer_profile = dealerResult.rows[0];
     }
 
-    await client.query('COMMIT'); // <--- Save everything
-    
-    // 5. Send Response
-    res.status(201).json({
-      status: "success",
-      data: newUser
-    });
+    await client.query('COMMIT'); // Commit Transaction
+
+    // 5. Generate Tokens & Response
+    await sendTokenResponse(newUser, 201, res);
 
   } catch (error) {
-    await client.query('ROLLBACK'); // <--- Undo everything if ANY error occurs
+    await client.query('ROLLBACK'); // Rollback on error
     
-    // Check for specific DB errors (like duplicate VAT)
-    if (error.code === '23505') { // Postgres Unique Violation code
+    // Handle Postgres Unique Constraint Errors
+    if (error.code === '23505') { 
       if (error.detail.includes('email')) throw new AppError("Email already exists", 400);
       if (error.detail.includes('vat_number')) throw new AppError("VAT Number already registered", 400);
     }
-    
-    throw error; // Let global error handler catch other errors
+    throw error;
   } finally {
     client.release();
   }
@@ -103,35 +147,30 @@ export const loginUser = asyncHandler(async (req, res) => {
   try {
     await client.query('BEGIN');
 
-    // A. Check if user exists
-    const userCheck = await client.query("SELECT id, password_hash FROM users WHERE email = $1", [email]);
+    // 1. Fetch User & Password Hash
+    const userCheck = await client.query("SELECT * FROM users WHERE email = $1", [email]);
     if (userCheck.rows.length === 0) {
-      throw new AppError("User not found", 401);
+      throw new AppError("Invalid email or password", 401);
     }
-    const { id, password_hash } = userCheck.rows[0];
+    
+    const user = userCheck.rows[0];
 
-    // B. Verify Password
-    const isPasswordValid = await bcrypt.compare(password, password_hash);
+    // 2. Verify Password
+    const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
-      throw new AppError("Invalid password", 401);
+      throw new AppError("Invalid email or password", 401);
     }
 
-    // C. Fetch User Data
-    const userData = await client.query("SELECT * FROM users WHERE id = $1", [id]);
-    const user = userData.rows[0];
-
-    // D. Fetch Dealer Profile (if dealer)
+    // 3. Fetch Dealer Profile (if needed)
     if (user.role === "dealer") {
-      const dealerData = await client.query("SELECT * FROM dealers WHERE user_id = $1", [id]);
+      const dealerData = await client.query("SELECT * FROM dealers WHERE user_id = $1", [user.id]);
       user.dealer_profile = dealerData.rows[0];
     }
 
     await client.query('COMMIT');
-    
-    res.status(200).json({
-      status: "success",
-      data: user
-    });
+
+    // 4. Generate Tokens & Response
+    await sendTokenResponse(user, 200, res);
 
   } catch (error) {
     await client.query('ROLLBACK');
@@ -139,4 +178,63 @@ export const loginUser = asyncHandler(async (req, res) => {
   } finally {
     client.release();
   }
+});
+
+export const refreshAccessToken = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies._refresh;
+
+  if (!refreshToken) {
+    throw new AppError("No refresh token provided", 401);
+  }
+
+  // 1. Verify JWT Signature
+  let decoded;
+  try {
+    // IMPORTANT: Must use JWT_REFRESH_SECRET
+    decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+  } catch (err) {
+    throw new AppError("Invalid refresh token", 403);
+  }
+
+  // 2. Redis Whitelist Check
+  // If the token is not in Redis, it might have been logged out/revoked
+  const storedUserId = await redisClient.get(`refresh_token:${refreshToken}`);
+
+  if (!storedUserId || storedUserId !== decoded.id.toString()) {
+    throw new AppError("Token expired or revoked", 403);
+  }
+
+  // 3. Issue New Access Token
+  const newAccessToken = generateAccessToken(storedUserId);
+  const newRefreshToken = generateRefreshToken(storedUserId);
+
+  // 4. Send via Cookie and JSON
+  res.cookie("_access", newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+  res.cookie("_refresh", newRefreshToken, cookieOptions);
+  
+  res.status(200).json({
+    status: "success",
+    accessToken: newAccessToken
+  });
+});
+
+export const logoutUser = asyncHandler(async (req, res) => {
+  const refreshToken = req.cookies._refresh;
+  const userId = req.user?.id; // From authMiddleware (if protected route)
+
+  if (refreshToken) {
+    // 1. Revoke Refresh Token (Remove from Redis)
+    await redisClient.del(`refresh_token:${refreshToken}`);
+  }
+
+  // 2. Optional: Kill the session cache immediately
+  if (userId) {
+    await redisClient.del(`session:${userId}`);
+  }
+
+  // 3. Clear Cookies
+  res.clearCookie("_refresh", cookieOptions);
+  res.clearCookie("_access", cookieOptions);
+
+  res.status(200).json({ status: "success", message: "Logged out successfully" });
 });
