@@ -180,7 +180,7 @@ export default function AccountButton() {
             >
               <LogOut size={16} style={{ color: "var(--text-muted)" }} />
               Logout
-            </>
+            </div>
           </div>
         </div>
       )}
