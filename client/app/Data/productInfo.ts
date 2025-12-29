@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Product } from "../../types/product";
+import { Product } from "../types/product";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const fetchProducts = async () => {

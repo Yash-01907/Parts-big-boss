@@ -15,7 +15,7 @@ import {
   partsMegaMenu,
   categoriesMegaMenu,
   brandsMegaMenu,
-} from "../Data/megaMenus";
+} from "../../Data/megaMenus";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState<boolean>(false);

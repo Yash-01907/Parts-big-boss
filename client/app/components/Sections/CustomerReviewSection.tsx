@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { customerReviews } from "../Data/customerReviewData";
+import { customerReviews } from "../../Data/customerReviewData";
 import CustomerReviewCard from "../CustomerReview/CustomerReviewCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";

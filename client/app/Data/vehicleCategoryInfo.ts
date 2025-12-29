@@ -1,6 +1,6 @@
 // client/app/utils/VehicleCategoryInfo.ts
 import axios from "axios";
-import { Make, Model } from "../../types/vehicle";
+import { Make, Model } from "../types/vehicle";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 

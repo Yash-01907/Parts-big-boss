@@ -87,3 +87,31 @@ CREATE INDEX IF NOT EXISTS idx_fitment_variant ON product_vehicle_fitment(vehicl
 -- Product Search Indexes
 CREATE INDEX IF NOT EXISTS idx_products_slug ON products(slug);
 CREATE INDEX IF NOT EXISTS idx_products_cat ON products(category_id);
+
+
+-- ==========================================
+-- 6. USERS & AUTH
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS customers (
+    id SERIAL PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS merchants (
+    id SERIAL PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    phone TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    gst_number TEXT,
+    shop_name TEXT,
+    shop_address TEXT,
+    established_year TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);

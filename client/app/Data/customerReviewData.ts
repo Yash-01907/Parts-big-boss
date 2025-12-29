@@ -1,5 +1,5 @@
 // customerReviewData.ts
-import { CustomerReview } from "../../types/review";
+import { CustomerReview } from "../types/review";
 
 export const customerReviews: CustomerReview[] = [
   {

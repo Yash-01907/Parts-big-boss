@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { vehicleCategoryInfo } from "../Data/vehicleCategoryInfo";
+import { vehicleCategoryInfo } from "../../Data/vehicleCategoryInfo";
 import { Make, Model } from "../../types/vehicle";
 
 // Simple Chevron Icon component to keep the main code clean
