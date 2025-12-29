@@ -14,7 +14,7 @@ export default function AccountButton() {
   // Check authentication status (replace with actual auth check)
   useEffect(() => {
     // TODO: Replace with actual authentication check (e.g., checking token/session)
-    setIsAuthenticated(false);
+    setIsAuthenticated(true);
   }, []);
 
   // Close dropdown when clicking outside
@@ -78,7 +78,7 @@ export default function AccountButton() {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Account Button */}
-      <button
+      <div
         onClick={() => setIsOpen(!isOpen)}
         className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-offset-2"
         style={{
@@ -92,15 +92,12 @@ export default function AccountButton() {
           size={20}
           className="transition-transform duration-200 group-hover:scale-110"
         />
-      </button>
+      </div>
 
       {/* Dropdown Menu */}
       {isOpen && (
         <div
-          className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl overflow-hidden z-40 animate-in fade-in duration-200"
-          style={{
-            backgroundColor: "var(--primary-white)",
-          }}
+          className="absolute right-0 mt-2 w-48 rounded-lg shadow-xl overflow-hidden z-40 animate-in fade-in duration-200 bg-white"
         >
           {/* Dropdown Header */}
           <div
@@ -168,7 +165,7 @@ export default function AccountButton() {
             />
 
             {/* Logout */}
-            <button
+            <div
               onClick={handleLogout}
               className="w-full text-left px-4 py-2 text-sm transition-colors duration-150 flex items-center gap-3"
               style={{
@@ -183,7 +180,7 @@ export default function AccountButton() {
             >
               <LogOut size={16} style={{ color: "var(--text-muted)" }} />
               Logout
-            </button>
+            </>
           </div>
         </div>
       )}
