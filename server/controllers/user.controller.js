@@ -96,7 +96,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     const userQuery = `
       INSERT INTO users (email, phone_number, first_name, last_name, password_hash, role) 
       VALUES ($1, $2, $3, $4, $5, $6) 
-      RETURNING id, email, first_name, last_name, role, phone_number, is_verified, created_at`; 
+      RETURNING id, email, first_name, last_name, role, phone_number, created_at`; 
     
     const userResult = await client.query(userQuery, [
       email, phone_number, first_name, last_name, hashedPassword, role
@@ -237,4 +237,11 @@ export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie("_access", cookieOptions);
 
   res.status(200).json({ status: "success", message: "Logged out successfully" });
+});
+
+
+export const getUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const user = await pool.query("SELECT id,email,first_name,last_name, FROM users WHERE id = $1", [userId]);
+  res.status(200).json(user.rows[0]);
 });
