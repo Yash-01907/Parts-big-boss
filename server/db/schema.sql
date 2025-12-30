@@ -73,6 +73,37 @@ CREATE TABLE IF NOT EXISTS product_vehicle_fitment (
     UNIQUE(product_id, vehicle_variant_id)
 );
 
+
+CREATE TABLE IF NOT EXISTS users (
+    id BIGSERIAL PRIMARY KEY,
+    email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    
+    -- Common Fields
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    phone_number TEXT NOT NULL,
+    
+    -- Role Management (Simple String Check is enough for now)
+    role TEXT NOT NULL DEFAULT 'customer', -- 'customer', 'dealer', 'admin'
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE IF NOT EXISTS user_addresses (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT NOT NULL,
+    state TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    country TEXT NOT NULL DEFAULT 'India',
+    is_default BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 -- ==========================================
 -- 5. ORDERS & ORDER ITEMS
 -- ==========================================
@@ -100,22 +131,6 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- ==========================================
 
 -- 1. The Base User Table (Common to Everyone)
-CREATE TABLE IF NOT EXISTS users (
-    id BIGSERIAL PRIMARY KEY,
-    email TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
-    
-    -- Common Fields
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    phone_number TEXT NOT NULL,
-    
-    -- Role Management (Simple String Check is enough for now)
-    role TEXT NOT NULL DEFAULT 'customer', -- 'customer', 'dealer', 'admin'
-    
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
 
 -- 2. The Dealer Profile (Extension Table)
 -- Only exists if role = 'dealer'
@@ -136,18 +151,7 @@ CREATE TABLE IF NOT EXISTS dealers (
 -- ==========================================
 -- 7. USER ADDRESSES
 -- ==========================================
-CREATE TABLE IF NOT EXISTS user_addresses (
-    id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
-    address_line1 TEXT NOT NULL,
-    address_line2 TEXT,
-    city TEXT NOT NULL,
-    state TEXT NOT NULL,
-    postal_code TEXT NOT NULL,
-    country TEXT NOT NULL DEFAULT 'India',
-    is_default BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+
 
 -- Update Orders table to link to an address
 -- ==========================================
