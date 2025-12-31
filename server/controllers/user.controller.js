@@ -242,6 +242,6 @@ export const logoutUser = asyncHandler(async (req, res) => {
 
 export const getUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const user = await pool.query("SELECT id,email,first_name,last_name, FROM users WHERE id = $1", [userId]);
+  const user = await pool.query("SELECT id,email,first_name,last_name FROM users WHERE id = $1", [userId]);
   res.status(200).json(user.rows[0]);
 });

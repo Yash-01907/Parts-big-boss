@@ -22,6 +22,5 @@ export const syncInventoryToRedis = async () => {
     console.error("❌ Sync failed:", error);
   } finally {
     client.release();
-    process.exit();
   }
 };

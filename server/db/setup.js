@@ -44,7 +44,7 @@ async function buildDatabase() {
     console.log("MEILI_HOST:", process.env.MEILI_HOST);
 
     await seedVehicles();
-    await meiliClient.deleteIndex("products"); // or deleteAllDocuments
+    // await meiliClient.deleteIndex("products"); // or deleteAllDocuments
     await configureMeili(); // searchable + filterable
     await syncInventoryToRedis();
     await syncMeili();
@@ -52,6 +52,7 @@ async function buildDatabase() {
     console.error("❌ Error:", err);
   } finally {
     await client.end();
+    process.exit();
   }
 }
 

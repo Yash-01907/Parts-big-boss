@@ -18,6 +18,8 @@ GROUP BY p.id;
 
   `);
 
+  console.log(rows)
+
   if (rows.length > 0) {
     console.log(`Sending ${rows.length} documents to Meilisearch...`);
     console.log("Sample doc keys:", Object.keys(rows[0]));
