@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, X } from "lucide-react";
+import { CloudCog, Search, X } from "lucide-react";
+import { useDebounce } from "../../store/useDebounce";
+import { searchSuggestion } from "../../Data/searchSuggestion";
 
 export default function SearchBar() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -12,6 +14,10 @@ export default function SearchBar() {
     "Brake pads",
     "Spark plugs",
   ]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+
+  // Debounce the search query
+  const debouncedSearchQuery = useDebounce(searchQuery, 10000);
 
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,15 +49,43 @@ export default function SearchBar() {
     }
   }, [isOpen]);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
+  // Fetch suggestions when debounced query changes
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (debouncedSearchQuery.trim()) {
+        try {
+          const results = await searchSuggestion(debouncedSearchQuery);
+          // Ensure results is an array before setting
+          if (Array.isArray(results)) {
+             setSuggestions(results);
+          } else {
+             // If API returns { products: [...] } or similar, adjust here. 
+             // For now assuming array or checking if data has property.
+             setSuggestions(results.products || []);
+          }
+        } catch (error) {
+          console.error("Error fetching suggestions:", error);
+          setSuggestions([]);
+        }
+      } else {
+        setSuggestions([]);
+      }
+    };
+
+    fetchSuggestions();
+  }, [debouncedSearchQuery]);
+
+  const handleSearch = (query: string = searchQuery) => {
+    if (query.trim()) {
       // Add to recent searches if not already there
-      if (!recentSearches.includes(searchQuery.trim())) {
-        setRecentSearches([searchQuery.trim(), ...recentSearches.slice(0, 4)]);
+      if (!recentSearches.includes(query.trim())) {
+        setRecentSearches([query.trim(), ...recentSearches.slice(0, 4)]);
       }
       // Handle search logic here
-      console.log("Searching for:", searchQuery);
+      console.log("Searching for:", query);
       setSearchQuery("");
+      setIsOpen(false);
+      // You might redirect here: router.push(`/search?q=${query}`)
     }
   };
 
@@ -63,14 +97,19 @@ export default function SearchBar() {
 
   const handleRecentSearchClick = (search: string) => {
     setSearchQuery(search);
-    // Optionally trigger search immediately
-    console.log("Selected recent search:", search);
+    handleSearch(search);
+  };
+
+  const handleSuggestionClick = (suggestion: any) => {
+      // Assuming suggestion object has a name or title, or is a string
+      const query = typeof suggestion === 'string' ? suggestion : suggestion.title || suggestion.name;
+      setSearchQuery(query);
+      handleSearch(query);
   };
 
   const removeRecentSearch = (searchToRemove: string) => {
     setRecentSearches(recentSearches.filter((s) => s !== searchToRemove));
   };
-
   return (
     <div ref={searchRef} className="relative flex items-center">
       {/* Search Button - stays in flex flow */}
@@ -101,7 +140,7 @@ export default function SearchBar() {
         )}
       </AnimatePresence>
 
-      {/* Animated Search Bar - IN FLEX FLOW (not absolute) */}
+      {/* Animated Search Bar - IN FLEX FLOW */}
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -146,7 +185,10 @@ export default function SearchBar() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.15 }}
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => {
+                        setSearchQuery("");
+                        setSuggestions([]);
+                    }}
                     className="
                       absolute right-3 top-1/2 -translate-y-1/2
                       text-gray-400 hover:text-gray-600
@@ -161,9 +203,9 @@ export default function SearchBar() {
               </AnimatePresence>
             </motion.div>
 
-            {/* Recent Searches - positioned relative to parent */}
+            {/* Dropdown: Recent Searches OR Suggestions */}
             <AnimatePresence>
-              {recentSearches.length > 0 && (
+              {(isOpen && (recentSearches.length > 0 || suggestions.length > 0)) && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -178,59 +220,86 @@ export default function SearchBar() {
                     bg-white rounded-lg shadow-lg border border-gray-200
                     overflow-hidden
                     z-50
+                    max-h-80 overflow-y-auto
                   "
                 >
                   <div className="py-2">
-                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Recent Searches
-                    </div>
-                    {recentSearches.map((search, index) => (
-                      <motion.div
-                        key={search}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{
-                          duration: 0.2,
-                          delay: index * 0.05,
-                        }}
-                        className="
-                          flex items-center justify-between
-                          px-4 py-2.5
-                          hover:bg-gray-50
-                          transition-colors
-                          group
-                        "
-                      >
-                        <div
-                          onClick={() => handleRecentSearchClick(search)}
-                          className="flex-1 text-left text-sm text-gray-700 hover:text-gray-900 cursor-pointer"
-                          role="button"
-                          tabIndex={0}
-                        >
-                          {search}
-                        </div>
-                        <motion.div
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeRecentSearch(search);
-                          }}
-                          className="
-                            p-1 rounded
-                            text-gray-400 hover:text-gray-600 hover:bg-gray-200
-                            opacity-0 group-hover:opacity-100
-                            transition-all cursor-pointer
-                          "
-                          aria-label="Remove search"
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <X size={14} />
-                        </motion.div>
-                      </motion.div>
-                    ))}
+                    {/* Show Suggestions if user is typing (debouncedQuery exists) and we have results */}
+                    {searchQuery.trim() && suggestions.length > 0 ? (
+                        <>
+                             <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Suggestions
+                             </div>
+                             {suggestions.map((item, index) => {
+                                 // Determine display text
+                                 const displayText = typeof item === 'string' ? item : (item.title || item.name || "Unknown Product");
+                                 return (
+                                    <div
+                                        key={item.id || index}
+                                        onClick={() => handleSuggestionClick(item)}
+                                        className="
+                                        flex items-center justify-between
+                                        px-4 py-2.5
+                                        hover:bg-gray-50
+                                        cursor-pointer
+                                        transition-colors
+                                        "
+                                    >
+                                        <div className="flex-1 text-sm text-gray-700">
+                                            {displayText}
+                                        </div>
+                                    </div>
+                                 );
+                             })}
+                        </>
+                    ) : (
+                        /* Show Recent Searches if no query or empty query */
+                        !searchQuery.trim() && recentSearches.length > 0 && (
+                            <>
+                                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Recent Searches
+                                </div>
+                                {recentSearches.map((search, index) => (
+                                <div
+                                    key={search}
+                                    className="
+                                    flex items-center justify-between
+                                    px-4 py-2.5
+                                    hover:bg-gray-50
+                                    transition-colors
+                                    group
+                                    cursor-pointer
+                                    "
+                                    onClick={() => handleRecentSearchClick(search)}
+                                >
+                                    <div
+                                    className="flex-1 text-left text-sm text-gray-700 hover:text-gray-900"
+                                    >
+                                    {search}
+                                    </div>
+                                    <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeRecentSearch(search);
+                                    }}
+                                    className="
+                                        p-1 rounded
+                                        text-gray-400 hover:text-gray-600 hover:bg-gray-200
+                                        opacity-0 group-hover:opacity-100
+                                        transition-all
+                                    "
+                                    role="button"
+                                    aria-label="Remove search"
+                                    >
+                                    <X size={14} />
+                                    </div>
+                                </div>
+                                ))}
+                            </>
+                        )
+                    )}
+                    
+                    {/* No results state could be added here if suggestions is empty but query exists */}
                   </div>
                 </motion.div>
               )}

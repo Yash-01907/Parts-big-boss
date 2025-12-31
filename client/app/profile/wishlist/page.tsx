@@ -3,7 +3,8 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { Heart, Tag } from "lucide-react";
-import ProductCardHorizontal from "../../components/Products/ProductCardHorizontal";
+// Import the specific Wishlist Card
+import WishlistProductCard from "./wishlistCard";
 import { Product } from "../../types/product";
 
 // Mock Data
@@ -57,6 +58,12 @@ const SUGGESTED_CATEGORIES = [
 export default function WishlistPage() {
   const hasItems = Object.keys(SAVED_ITEMS).length > 0;
 
+  // Handler to sync removal with backend (optional for now)
+  const handleRemoveItem = (id: string | number) => {
+    console.log("Removing item from wishlist:", id);
+    // TODO: Call API to remove item
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -79,21 +86,16 @@ export default function WishlistPage() {
                 <Tag size={20} className="text-[var(--accent)]" />
                 For {groupName}
               </h2>
-              {/* Updated Grid for Horizontal Cards */}
+              
+              {/* Wishlist Grid */}
               <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
                 {products.map((product) => (
-                     <ProductCardHorizontal 
-                           id={product.id.toString()}
-                           name={product.title}
-                           partNumber={product.part_number}
-                           price={product.price}
-                           image={product.image_url}
-                           rating={product.rating}
-                           reviewCount={product.rating_count}
-                           // You might need to mock these if they aren't in your DB yet
-                           inStock={true} 
-                           brand={product.category || "Generic"}
-                         /> 
+                  <WishlistProductCard 
+                    key={product.id} 
+                    // Cast mock data to Product type if needed, or ensure mock data matches interface
+                    product={product as unknown as Product}
+                    onRemove={handleRemoveItem}
+                  /> 
                 ))}
               </div>
             </motion.div>

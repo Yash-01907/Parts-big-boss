@@ -18,7 +18,7 @@ interface ProductCardProps {
   compatibility?: string;
   brand: string;
 }
-
+import { cartStore } from "@/app/store/useCartCount";
 export default function ProductCard({
   name,
   partNumber,
@@ -32,10 +32,16 @@ export default function ProductCard({
   brand,
 }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
-
+  
   const handleAddToCart = () => {
+    if (isAdded) {
+       // Redirect to checkout or cart
+       window.location.href = "/cart"; // Or use router.push if using useRouter
+       return;
+    }
     setIsAdded(true);
-    setTimeout(() => setIsAdded(false), 2000);
+    cartStore.increment();
+    // No timeout, keeps "Buy Now" state
   };
 
   const discount = originalPrice
@@ -125,13 +131,13 @@ export default function ProductCard({
         {/* Add to Cart Button */}
         <button
           onClick={handleAddToCart}
-          disabled={!inStock || isAdded}
+          disabled={!inStock}
           className={`
             inline-flex items-center justify-center w-full h-9 px-4 py-2 
             text-sm font-medium transition-colors rounded-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 
             disabled:pointer-events-none disabled:opacity-50
             ${isAdded 
-              ? "bg-green-600 text-white hover:bg-green-700" 
+              ? "bg-blue-600 text-white hover:bg-blue-700" 
               : "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
             }
           `}
@@ -139,7 +145,7 @@ export default function ProductCard({
           {isAdded ? (
             <>
               <Check className="w-4 h-4 mr-2" />
-              Added
+              Buy Now
             </>
           ) : (
             <>

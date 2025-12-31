@@ -1,15 +1,4 @@
-import axios from 'axios';
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
-
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true
-});
-
+import {api} from "../axios/axiosConfig";
 // --- Customer Auth APIs ---
 export const customerLogin = async (data: any) => {
   try {
@@ -68,3 +57,4 @@ export const logoutUser = async () => {
     throw error.response?.data || error.message;
   }
 };
+

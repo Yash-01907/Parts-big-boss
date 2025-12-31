@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Plus, Trash2, Edit2, CheckCircle2, Zap, ArrowRight, ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function MyGarage() {
   const [shopForCar, setShopForCar] = useState(true);
