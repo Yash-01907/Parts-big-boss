@@ -7,13 +7,14 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true
 });
 
 // --- Customer Auth APIs ---
-
 export const customerLogin = async (data: any) => {
   try {
-    const response = await api.post('/auth/customer/login', data);
+    // Add the config object as the 3rd argument
+    const response = await api.post('/api/users/login', data);
     return response.data;
   } catch (error: any) {
     throw error.response?.data || error.message;
@@ -22,9 +23,10 @@ export const customerLogin = async (data: any) => {
 
 export const customerSignup = async (data: any) => {
   try {
-    const response = await api.post('/auth/customer/signup', data);
+    const response = await api.post('/api/users/register', data);
     return response.data;
   } catch (error: any) {
+    console.log(error.response?.data);
     throw error.response?.data || error.message;
   }
 };
@@ -52,6 +54,15 @@ export const merchantLogin = async (data: any) => {
 export const merchantSignup = async (data: any) => {
   try {
     const response = await api.post('/auth/merchant/signup', data);
+    return response.data;
+  } catch (error: any) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const logoutUser = async () => {
+  try {
+    const response = await api.post('/api/users/logout');
     return response.data;
   } catch (error: any) {
     throw error.response?.data || error.message;

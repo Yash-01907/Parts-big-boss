@@ -1,18 +1,44 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import CustomerSignup from "./CustomerSignup";
 import MerchantSignup from "./MerchantSignup";
 import SignupStyles from "./SignupStyles";
 import { useAuthStore, authStore } from "../store/useAuthStore";
+import { bootstrapAuth } from "../store/bootstrapAuth";
+import { CheckCircle2 } from "lucide-react";
 
 export default function SignupPage() {
-  const { activeAuthTab } = useAuthStore();
-  
+  const { activeAuthTab, isAuthenticated } = useAuthStore();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true); 
+  useEffect(() => {
+    bootstrapAuth();
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated, router]);
   const handleTabChange = (type: 'customer' | 'merchant') => {
     authStore.setAuthTab(type);
   }
 
+  if (loading || isAuthenticated) {
+    return (
+      <div>
+        <div className="flex items-center gap-2 min-h-screen w-full justify-center text-4xl font-bold">
+          <CheckCircle2 className="text-4xl animate-pulse text-[var(--accent)]" />
+          <span>Loading...</span>
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div className="min-h-screen w-full flex bg-[var(--background)]">
       

@@ -29,9 +29,9 @@ export default function CustomerLogin() {
       authStore.login({
         id: data.id || 'temp-id', // Replace with actual response fields
         email: data.email || email,
-        name: data.name,
-        type: 'customer',
-        token: data.token
+        name: data.first_name,
+        type: 'customer'
+        // token: data.token
       });
 
       // Redirect or show success

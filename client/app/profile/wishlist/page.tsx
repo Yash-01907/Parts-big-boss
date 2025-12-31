@@ -80,9 +80,20 @@ export default function WishlistPage() {
                 For {groupName}
               </h2>
               {/* Updated Grid for Horizontal Cards */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
                 {products.map((product) => (
-                     <ProductCardHorizontal key={product.id} product={product} /> 
+                     <ProductCardHorizontal 
+                           id={product.id.toString()}
+                           name={product.title}
+                           partNumber={product.part_number}
+                           price={product.price}
+                           image={product.image_url}
+                           rating={product.rating}
+                           reviewCount={product.rating_count}
+                           // You might need to mock these if they aren't in your DB yet
+                           inStock={true} 
+                           brand={product.category || "Generic"}
+                         /> 
                 ))}
               </div>
             </motion.div>

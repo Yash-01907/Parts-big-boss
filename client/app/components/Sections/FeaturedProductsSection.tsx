@@ -5,8 +5,8 @@ import { Product } from "../../types/product";
 import ProductCard from "../Products/ProductCardVertical";
 import { FEATURED_PRODUCTS } from "../../Data/productInfo";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 export default function FeaturedProductsSection() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
@@ -65,9 +65,12 @@ export default function FeaturedProductsSection() {
                 <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                     Featured Products
                 </h2>
-                <a href="/products" className="text-[var(--accent)] font-semibold text-sm hover:underline">
-                    View All
-                </a>
+                <Link 
+            href="/products" 
+            className="hidden md:flex items-center text-[var(--accent)] font-semibold hover:text-[var(--accent-hover)] transition-colors"
+          >
+            View All Products <ArrowRight className="ml-2 w-4 h-4" />
+          </Link>
             </div>
             
             <div className="relative min-h-[400px]">
@@ -80,11 +83,22 @@ export default function FeaturedProductsSection() {
                         transition={{ duration: 0.3 }}
                         className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4'}`}
                     >
-                        {currentProducts.map((product) => (
-                            <div key={product.id} className="h-full">
-                                <ProductCard product={product} />
-                            </div>
-                        ))}
+                      {currentProducts.map((product) => (
+  <div key={product.id} className="h-full">
+    <ProductCard 
+      id={product.id.toString()}
+      name={product.title}
+      partNumber={product.part_number}
+      price={product.price}
+      image={product.image_url}
+      rating={product.rating}
+      reviewCount={product.rating_count}
+      // You might need to mock these if they aren't in your DB yet
+      inStock={true} 
+      brand={product.category || "Generic"}
+    />
+  </div>
+))}
                     </motion.div>
                 </AnimatePresence>
 

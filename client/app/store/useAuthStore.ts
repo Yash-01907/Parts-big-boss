@@ -1,5 +1,4 @@
 import { useSyncExternalStore } from 'react';
-
 // Types
 interface User {
   id: string;
@@ -23,7 +22,19 @@ let authState: AuthState = {
   activeAuthTab: 'customer',
 };
 
+// hydrate for caching login
+export const hydrate = (user: User | null) => {
+  authState = {
+    ...authState,
+    user,
+    isAuthenticated: !!user,
+  };
+  emitChange();
+};
+
 const listeners = new Set<() => void>();
+// const listeners = new Set();
+
 
 // Store Implementation
 export const authStore = {

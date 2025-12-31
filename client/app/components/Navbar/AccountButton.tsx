@@ -5,6 +5,7 @@ import Link from "next/link";
 import { User, LogOut, ShoppingBag } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAuthStore, authStore } from "../../store/useAuthStore";
+import { logoutUser } from "@/app/Data/authLoginInfo";
 
 export default function AccountButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -44,8 +45,9 @@ export default function AccountButton() {
     }
   }, [isOpen]);
 
-  const handleLogout = () => {
-    authStore.logout();
+  const handleLogout = async () => {
+    await logoutUser()
+     authStore.logout();
     setIsOpen(false);
     router.push("/");
   };
@@ -74,10 +76,7 @@ export default function AccountButton() {
       {/* Account Button */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-offset-2"
-        style={{
-          color: "var(--primary-white)",
-        }}
+        className="hidden lg:flex items-center justify-center p-2 rounded-lg transition-colors duration-200 group focus:outline-none focus:ring-2 focus:ring-offset-2 text-white cursor-pointer hover:text-black hover:bg-[var(--surface-hover)]"
         aria-label="Account menu"
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -133,7 +132,7 @@ export default function AccountButton() {
 
             {/* Orders */}
             <Link
-              href="/orders"
+              href="/profile/orders"
               className="w-full text-left px-4 py-2 text-sm transition-colors duration-150 flex items-center gap-3"
               style={{
                 color: "var(--foreground-light)",

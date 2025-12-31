@@ -1,5 +1,5 @@
 "use client";
-
+import { bootstrapAuth } from "./store/bootstrapAuth";
 import Navbar from "./components/Sections/Navbar";
 import HeroSlider from "./components/Hero-Slider/HeroSlider";
 import VehicleSelector from "./components/Sections/VehicleSelector";
@@ -8,7 +8,11 @@ import CustomerReviewSection from "./components/Sections/CustomerReviewSection";
 import CategoryGrid from "./components/Sections/CategoryGrid";
 import BrandMarquee from "./components/Sections/BrandMarquee";
 import Footer from "./components/Sections/Footer";
+import { useEffect } from "react";
 export default function Home() {
+  useEffect(() => {
+    bootstrapAuth();
+  }, []);
   return (
     <>
       <Navbar />
