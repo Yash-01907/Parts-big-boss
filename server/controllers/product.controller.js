@@ -76,6 +76,52 @@ import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import { searchWithMeili } from "../services/searchProductMeili.js";
 import { pool } from "../db/db.js";
+import redisClient from "../db/redisClient.js";
+
+
+export const getFeaturedProducts = asyncHandler(async (req, res) => {
+  const cacheKey = "products:featured";
+
+  // 1. Try Redis Cache first
+  const cachedData = await redisClient.get(cacheKey);
+  if (cachedData) {
+    return res.json(JSON.parse(cachedData));
+  }
+
+  // 2. Database Query (Aggregated Sales)
+  // We calculate "Best Sellers" by summing quantity from VALID orders only.
+  const query = `
+    SELECT p.id, p.title, p.price, p.image_url, p.slug, p.part_number, 
+           SUM(oi.quantity) as total_sold
+    FROM products p
+    JOIN order_items oi ON p.id = oi.product_id
+    JOIN orders o ON oi.order_id = o.id
+    WHERE o.status IN ('paid', 'shipped') 
+    GROUP BY p.id
+    ORDER BY total_sold DESC
+    LIMIT 10
+  `;
+
+  let { rows } = await pool.query(query);
+
+  if (rows.length === 0) {
+    const fallbackQuery = `
+      SELECT id, title, price, image_url, slug, part_number
+      FROM products
+      ORDER BY created_at DESC
+      LIMIT 10
+    `;
+    const fallbackResult = await pool.query(fallbackQuery);
+    rows = fallbackResult.rows;
+  }
+
+  if (rows.length > 0) {
+    await redisClient.set(cacheKey, JSON.stringify(rows), "EX", 21600);
+  }
+
+  res.json(rows);
+});
+
 
 export const searchProducts = asyncHandler(async (req, res, next) => {
   const {

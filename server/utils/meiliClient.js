@@ -17,6 +17,7 @@ const configureMeili = async () => {
     "fits_models",
     "category_slug",
     "attributes.brand",
+    "title_compressed",
   ]);
 
   await index.updateFilterableAttributes([
