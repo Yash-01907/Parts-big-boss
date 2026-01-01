@@ -207,7 +207,23 @@ CREATE TABLE IF NOT EXISTS order_items (
 -- BEFORE UPDATE ON orders
 -- FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
-
+-- =========================================================
+-- 10. USER VEHICLES (The "Garage")
+-- =========================================================
+CREATE TABLE IF NOT EXISTS user_vehicles (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    vehicle_variant_id INTEGER NOT NULL REFERENCES vehicle_variants(id) ON DELETE CASCADE,
+    
+    nickname TEXT, -- e.g., "Dad's Truck"
+    is_active BOOLEAN NOT NULL DEFAULT FALSE,
+    
+    -- Future proofing: Helps calculating "Profile Completeness"
+    fitment_completeness INTEGER DEFAULT 100 CHECK (fitment_completeness BETWEEN 0 AND 100),
+    
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 -- =========================================================
 -- 11. INDEXES (Performance Optimization)
 -- =========================================================
@@ -230,3 +246,9 @@ CREATE INDEX IF NOT EXISTS idx_products_part_number ON products(part_number);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+
+
+-- Indexes for Dashboard Speed
+CREATE INDEX IF NOT EXISTS idx_user_vehicles_user ON user_vehicles(user_id);
+-- Fast lookup for "Current Active Vehicle"
+CREATE INDEX IF NOT EXISTS idx_user_vehicles_active ON user_vehicles(user_id) WHERE is_active = TRUE;
