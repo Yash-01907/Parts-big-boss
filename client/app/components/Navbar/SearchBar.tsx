@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { CloudCog, Search, X } from "lucide-react";
 import { useDebounce } from "../../store/useDebounce";
 import { searchSuggestion } from "../../Data/searchSuggestion";
 
 export default function SearchBar() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [recentSearches, setRecentSearches] = useState<string[]>([
@@ -57,11 +59,11 @@ export default function SearchBar() {
           const results = await searchSuggestion(debouncedSearchQuery);
           // Ensure results is an array before setting
           if (Array.isArray(results)) {
-             setSuggestions(results);
+            setSuggestions(results);
           } else {
-             // If API returns { products: [...] } or similar, adjust here. 
-             // For now assuming array or checking if data has property.
-             setSuggestions(results.products || []);
+            // If API returns { products: [...] } or similar, adjust here.
+            // For now assuming array or checking if data has property.
+            setSuggestions(results.products || []);
           }
         } catch (error) {
           console.error("Error fetching suggestions:", error);
@@ -81,11 +83,10 @@ export default function SearchBar() {
       if (!recentSearches.includes(query.trim())) {
         setRecentSearches([query.trim(), ...recentSearches.slice(0, 4)]);
       }
-      // Handle search logic here
-      console.log("Searching for:", query);
+
       setSearchQuery("");
       setIsOpen(false);
-      // You might redirect here: router.push(`/search?q=${query}`)
+      router.push(`/search?q=${encodeURIComponent(query.trim())}`);
     }
   };
 
@@ -101,10 +102,13 @@ export default function SearchBar() {
   };
 
   const handleSuggestionClick = (suggestion: any) => {
-      // Assuming suggestion object has a name or title, or is a string
-      const query = typeof suggestion === 'string' ? suggestion : suggestion.title || suggestion.name;
-      setSearchQuery(query);
-      handleSearch(query);
+    // Assuming suggestion object has a name or title, or is a string
+    const query =
+      typeof suggestion === "string"
+        ? suggestion
+        : suggestion.title || suggestion.name;
+    setSearchQuery(query);
+    handleSearch(query);
   };
 
   const removeRecentSearch = (searchToRemove: string) => {
@@ -186,8 +190,8 @@ export default function SearchBar() {
                     exit={{ opacity: 0, scale: 0.8 }}
                     transition={{ duration: 0.15 }}
                     onClick={() => {
-                        setSearchQuery("");
-                        setSuggestions([]);
+                      setSearchQuery("");
+                      setSuggestions([]);
                     }}
                     className="
                       absolute right-3 top-1/2 -translate-y-1/2
@@ -205,64 +209,69 @@ export default function SearchBar() {
 
             {/* Dropdown: Recent Searches OR Suggestions */}
             <AnimatePresence>
-              {(isOpen && (recentSearches.length > 0 || suggestions.length > 0)) && (
-                <motion.div
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{
-                    duration: 0.2,
-                    delay: 0.1,
-                    ease: [0.4, 0, 0.2, 1],
-                  }}
-                  className="
+              {isOpen &&
+                (recentSearches.length > 0 || suggestions.length > 0) && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{
+                      duration: 0.2,
+                      delay: 0.1,
+                      ease: [0.4, 0, 0.2, 1],
+                    }}
+                    className="
                     absolute top-full left-0 right-0 mt-2
                     bg-white rounded-lg shadow-lg border border-gray-200
                     overflow-hidden
                     z-50
                     max-h-80 overflow-y-auto
                   "
-                >
-                  <div className="py-2">
-                    {/* Show Suggestions if user is typing (debouncedQuery exists) and we have results */}
-                    {searchQuery.trim() && suggestions.length > 0 ? (
+                  >
+                    <div className="py-2">
+                      {/* Show Suggestions if user is typing (debouncedQuery exists) and we have results */}
+                      {searchQuery.trim() && suggestions.length > 0 ? (
                         <>
-                             <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Suggestions
-                             </div>
-                             {suggestions.map((item, index) => {
-                                 // Determine display text
-                                 const displayText = typeof item === 'string' ? item : (item.title || item.name || "Unknown Product");
-                                 return (
-                                    <div
-                                        key={item.id || index}
-                                        onClick={() => handleSuggestionClick(item)}
-                                        className="
+                          <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Suggestions
+                          </div>
+                          {suggestions.map((item, index) => {
+                            // Determine display text
+                            const displayText =
+                              typeof item === "string"
+                                ? item
+                                : item.title || item.name || "Unknown Product";
+                            return (
+                              <div
+                                key={item.id || index}
+                                onClick={() => handleSuggestionClick(item)}
+                                className="
                                         flex items-center justify-between
                                         px-4 py-2.5
                                         hover:bg-gray-50
                                         cursor-pointer
                                         transition-colors
                                         "
-                                    >
-                                        <div className="flex-1 text-sm text-gray-700">
-                                            {displayText}
-                                        </div>
-                                    </div>
-                                 );
-                             })}
-                        </>
-                    ) : (
-                        /* Show Recent Searches if no query or empty query */
-                        !searchQuery.trim() && recentSearches.length > 0 && (
-                            <>
-                                <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                                Recent Searches
+                              >
+                                <div className="flex-1 text-sm text-gray-700">
+                                  {displayText}
                                 </div>
-                                {recentSearches.map((search, index) => (
-                                <div
-                                    key={search}
-                                    className="
+                              </div>
+                            );
+                          })}
+                        </>
+                      ) : (
+                        /* Show Recent Searches if no query or empty query */
+                        !searchQuery.trim() &&
+                        recentSearches.length > 0 && (
+                          <>
+                            <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                              Recent Searches
+                            </div>
+                            {recentSearches.map((search, index) => (
+                              <div
+                                key={search}
+                                className="
                                     flex items-center justify-between
                                     px-4 py-2.5
                                     hover:bg-gray-50
@@ -270,39 +279,37 @@ export default function SearchBar() {
                                     group
                                     cursor-pointer
                                     "
-                                    onClick={() => handleRecentSearchClick(search)}
-                                >
-                                    <div
-                                    className="flex-1 text-left text-sm text-gray-700 hover:text-gray-900"
-                                    >
-                                    {search}
-                                    </div>
-                                    <div
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        removeRecentSearch(search);
-                                    }}
-                                    className="
+                                onClick={() => handleRecentSearchClick(search)}
+                              >
+                                <div className="flex-1 text-left text-sm text-gray-700 hover:text-gray-900">
+                                  {search}
+                                </div>
+                                <div
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeRecentSearch(search);
+                                  }}
+                                  className="
                                         p-1 rounded
                                         text-gray-400 hover:text-gray-600 hover:bg-gray-200
                                         opacity-0 group-hover:opacity-100
                                         transition-all
                                     "
-                                    role="button"
-                                    aria-label="Remove search"
-                                    >
-                                    <X size={14} />
-                                    </div>
+                                  role="button"
+                                  aria-label="Remove search"
+                                >
+                                  <X size={14} />
                                 </div>
-                                ))}
-                            </>
+                              </div>
+                            ))}
+                          </>
                         )
-                    )}
-                    
-                    {/* No results state could be added here if suggestions is empty but query exists */}
-                  </div>
-                </motion.div>
-              )}
+                      )}
+
+                      {/* No results state could be added here if suggestions is empty but query exists */}
+                    </div>
+                  </motion.div>
+                )}
             </AnimatePresence>
           </motion.div>
         )}
