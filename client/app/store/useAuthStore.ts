@@ -4,7 +4,8 @@ import { UserVehicle } from '../types/vehicle'; // Import the new type
 // Types
 interface User {
   id: string;
-  name?: string;
+  first_name?: string;
+  last_name?: string;
   email: string;
   type: 'customer' | 'merchant';
   token?: string;

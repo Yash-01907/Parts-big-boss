@@ -27,4 +27,5 @@ export interface UserVehicle {
   model_name?: string;
   make_name?: string;
   year?: number;
+  submodel?: string;
 }

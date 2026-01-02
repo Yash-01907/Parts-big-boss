@@ -34,7 +34,7 @@ export default function ProfileSidebar() {
   return (
     <>
       {/* ================= MOBILE VIEW (< md) ================= */}
-      <div className="md:hidden sticky top-0 z-30 w-full bg-black text-white p-4 rounded-b-[15px] shadow-lg transition-all duration-300">
+      <div className="md:hidden sticky top-0 z-30 w-full bg-black text-white p-4 shadow-lg transition-all duration-300">
         <div className="flex items-center justify-between">
            {/* LEFT: Back to Home */}
            <Link href="/" className="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white">

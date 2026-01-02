@@ -114,6 +114,25 @@ export default function SearchBar() {
   const removeRecentSearch = (searchToRemove: string) => {
     setRecentSearches(recentSearches.filter((s) => s !== searchToRemove));
   };
+  // Determine mobile viewport
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+
+    // Check initially
+    if (typeof window !== "undefined") {
+      checkMobile();
+      window.addEventListener("resize", checkMobile);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", checkMobile);
+      }
+    };
+  }, []);
+
   return (
     <div ref={searchRef} className="relative flex items-center">
       {/* Search Button - stays in flex flow */}
@@ -149,7 +168,11 @@ export default function SearchBar() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, width: 0, marginLeft: 0 }}
-            animate={{ opacity: 1, width: 320, marginLeft: 8 }}
+            animate={{
+              opacity: 1,
+              width: isMobile ? 200 : 320,
+              marginLeft: 8,
+            }}
             exit={{ opacity: 0, width: 0, marginLeft: 0 }}
             transition={{
               duration: 0.3,

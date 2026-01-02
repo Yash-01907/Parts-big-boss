@@ -24,12 +24,13 @@ export default function CustomerLogin() {
 
     try {
       const data = await customerLogin({ email, password });
+      console.log(data)
       
       // Update global store
       authStore.login({
         id: data.id || 'temp-id', // Replace with actual response fields
         email: data.email || email,
-        name: data.first_name,
+        first_name: data.first_name,
         type: 'customer'
         // token: data.token
       });

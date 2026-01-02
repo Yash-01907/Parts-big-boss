@@ -41,7 +41,7 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
            animate={{ opacity: 1, x: 0 }}
            transition={{ duration: 0.5, delay: 0.2 }}
            // Padding adjustments to align nicely with the vertical sidebar
-           className="pt-6 px-4 md:px-8 lg:px-12 pb-12"
+          
         >
           {children}
         </motion.div>
