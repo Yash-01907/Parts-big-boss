@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+import AuthInitializer from "./components/Sections/AuthIntialiser";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${manrope.variable} antialiased`}>
+        <AuthInitializer />
         {children}
       </body>
     </html>

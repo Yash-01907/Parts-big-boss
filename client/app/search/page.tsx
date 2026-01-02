@@ -7,7 +7,7 @@ import Navbar from "@/app/components/Sections/Navbar";
 import Footer from "@/app/components/Sections/Footer";
 import ProductCard from "@/app/components/Products/ProductCardVertical";
 import { Product } from "@/app/types/product";
-import { Loader2 } from "lucide-react";
+import Loader from "@/app/components/Loader";
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -76,7 +76,7 @@ function SearchContent() {
 
         {loading ? (
           <div className="flex justify-center items-center h-64">
-            <Loader2 className="w-12 h-12 animate-spin text-[var(--accent)]" />
+            <Loader fullScreen={false} />
           </div>
         ) : error ? (
           <div className="text-center py-12 text-red-500">{error}</div>
@@ -117,7 +117,7 @@ function SearchContent() {
 
 export default function SearchPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <SearchContent />
     </Suspense>
   );

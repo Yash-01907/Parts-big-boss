@@ -9,6 +9,7 @@ import MerchantLogin from "./MerchantLogin";
 import LoginStyle from "./LoginStyle";
 import { useAuthStore, authStore } from "../store/useAuthStore";
 import { bootstrapAuth } from "../store/bootstrapAuth";
+import Loader from "../components/Loader";
 
 export default function LoginPage() {
   const { activeAuthTab, isAuthenticated } = useAuthStore();
@@ -27,21 +28,17 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, router]);
 
-  // Handlers
+// ... imports
+// import FullPageLoader from "../components/FullPageLoader"; // (Moved to top via next step or manually)
+
+// Handlers
   const handleTabChange = (type: 'customer' | 'merchant') => {
     authStore.setAuthTab(type);
   }
 
   // Show loading spinner if initially loading OR if the user is authenticated (redirecting)
   if (loading || isAuthenticated) {
-    return (
-      <div>
-        <div className="flex items-center gap-2 min-h-screen w-full justify-center text-4xl font-bold">
-          <CheckCircle2 className="text-4xl animate-pulse text-[var(--accent)]" />
-          <span>Loading...</span>
-        </div>
-      </div>
-    );
+    return <Loader label="Authenticating..." />;
   }
   
   return (

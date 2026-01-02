@@ -15,6 +15,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   activeAuthTab: 'customer' | 'merchant';
+  isInitialized: boolean;
   
   // NEW: Vehicle State
   userGarage: UserVehicle[];
@@ -26,6 +27,7 @@ let authState: AuthState = {
   user: null,
   isAuthenticated: false,
   activeAuthTab: 'customer',
+  isInitialized: false,
   userGarage: [],
   activeVehicle: null,
 };
@@ -38,6 +40,7 @@ export const hydrate = (user: User | null, garage: UserVehicle[] = []) => {
     ...authState,
     user,
     isAuthenticated: !!user,
+    isInitialized: true,
     userGarage: garage,
     activeVehicle: activeCar,
   };
@@ -125,6 +128,7 @@ const serverSnapshot: AuthState = {
   user: null,
   isAuthenticated: false,
   activeAuthTab: 'customer',
+  isInitialized: false,
   userGarage: [],
   activeVehicle: null,
 };
