@@ -2,8 +2,16 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown } from "lucide-react";
-import MegaMenuSection from "./MegaMenuSection";
+import { ChevronDown, Loader2 } from "lucide-react";
+import dynamic from "next/dynamic";
+
+const MegaMenuSection = dynamic(() => import("./MegaMenuSection"), {
+  loading: () => (
+    <div className="p-4 flex justify-center">
+      <Loader2 className="animate-spin text-gray-400" size={24} />
+    </div>
+  ),
+});
 
 interface MegaMenuSectionItem {
   label: string;
