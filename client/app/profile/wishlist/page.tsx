@@ -65,57 +65,66 @@ export default function WishlistPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="w-full min-h-[calc(100vh-6rem)] bg-[var(--background)] p-4 lg:p-8 rounded-xl flex flex-col gap-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[var(--foreground)]">Saved Parts</h1>
-        <p className="text-[var(--text-secondary)]">Your wishlist grouped by compatibility</p>
+        <h1 className="text-3xl font-bold text-[var(--foreground)]">
+          Saved Parts
+        </h1>
+        <p className="text-[var(--text-secondary)]">
+          Your wishlist grouped by compatibility
+        </p>
       </div>
 
       {hasItems ? (
         <div className="space-y-10">
-          {Object.entries(SAVED_ITEMS).map(([groupName, products], groupIndex) => (
-            <motion.div
-              key={groupName}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: groupIndex * 0.1 }}
-              className="space-y-4"
-            >
-              <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
-                <Tag size={20} className="text-[var(--accent)]" />
-                For {groupName}
-              </h2>
-              
-              {/* Wishlist Grid */}
-              <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
-                {products.map((product) => (
-                  <WishlistProductCard 
-                    key={product.id} 
-                    // Cast mock data to Product type if needed, or ensure mock data matches interface
-                    product={product as unknown as Product}
-                    onRemove={handleRemoveItem}
-                  /> 
-                ))}
-              </div>
-            </motion.div>
-          ))}
+          {Object.entries(SAVED_ITEMS).map(
+            ([groupName, products], groupIndex) => (
+              <motion.div
+                key={groupName}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: groupIndex * 0.1 }}
+                className="space-y-4"
+              >
+                <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
+                  <Tag size={20} className="text-[var(--accent)]" />
+                  For {groupName}
+                </h2>
+
+                {/* Wishlist Grid */}
+                <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
+                  {products.map((product) => (
+                    <WishlistProductCard
+                      key={product.id}
+                      // Cast mock data to Product type if needed, or ensure mock data matches interface
+                      product={product as unknown as Product}
+                      onRemove={handleRemoveItem}
+                    />
+                  ))}
+                </div>
+              </motion.div>
+            )
+          )}
         </div>
       ) : (
         /* Empty State */
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center justify-center py-20 text-center"
+          className="flex-1 flex flex-col items-center justify-center py-20 text-center border-2 border-dashed border-[var(--border)] rounded-3xl bg-[var(--surface)]"
         >
           <div className="w-24 h-24 rounded-full bg-[var(--surface-hover)] flex items-center justify-center text-[var(--text-muted)] mb-6">
             <Heart size={40} />
           </div>
-          <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">Your wishlist is empty</h3>
+          <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">
+            Your wishlist is empty
+          </h3>
           <p className="text-[var(--text-secondary)] max-w-xs mb-8">
-            Start saving parts for your dream build. Here are some popular categories:
+            Start saving parts for your dream build. Here are some popular
+            categories:
           </p>
-          
+
           <div className="flex flex-wrap justify-center gap-3">
             {SUGGESTED_CATEGORIES.map((cat) => (
               <Link
