@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { api } from "@/app/axios/axiosConfig";
 import Navbar from "@/app/components/Sections/Navbar";
 import Footer from "@/app/components/Sections/Footer";
-import ProductCard from "@/app/components/Products/ProductCardVertical";
+import ProductCard from "@/app/components/product-components/ProductCardVertical";
 import { Product } from "@/app/types/product";
 import Loader from "@/app/components/Loader";
 
@@ -106,6 +106,7 @@ function SearchContent() {
                   reviewCount={product.rating_count || 0}
                   inStock={true}
                   brand={product.category || "Generic"}
+                  slug={product.slug}
                 />
               </div>
             ))}

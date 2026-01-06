@@ -1,10 +1,9 @@
-import {
-  ShoppingCart,
-  Star,
-  Package,
-  Check,
-} from "lucide-react";
+"use client";
+
+import { ShoppingCart, Star, Package, Check } from "lucide-react";
 import { useState } from "react";
+import Link from "next/link";
+
 interface ProductCardProps {
   id: string;
   name: string;
@@ -17,6 +16,7 @@ interface ProductCardProps {
   inStock: boolean;
   compatibility?: string;
   brand: string;
+  slug?: string;
 }
 import { cartStore } from "@/app/store/useCartCount";
 export default function ProductCard({
@@ -30,14 +30,15 @@ export default function ProductCard({
   inStock,
   compatibility,
   brand,
+  slug,
 }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
-  
+
   const handleAddToCart = () => {
     if (isAdded) {
-       // Redirect to checkout or cart
-       window.location.href = "/cart"; // Or use router.push if using useRouter
-       return;
+      // Redirect to checkout or cart
+      window.location.href = "/cart"; // Or use router.push if using useRouter
+      return;
     }
     setIsAdded(true);
     cartStore.increment();
@@ -45,21 +46,15 @@ export default function ProductCard({
   };
 
   const discount = originalPrice
-    ? Math.round(
-        ((originalPrice - price) / originalPrice) * 100,
-      )
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Section */}
       <div className="relative bg-gray-50 aspect-[4/3]">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover"
-        />
-        
+        <img src={image} alt={name} className="w-full h-full object-cover" />
+
         {/* Discount Badge */}
         {discount > 0 && (
           <span className="absolute top-2 left-2 inline-flex items-center rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-semibold text-white transition-colors hover:bg-red-700">
@@ -83,12 +78,19 @@ export default function ProductCard({
       {/* Content Section */}
       <div className="p-3">
         {/* Brand */}
-        <p className="text-gray-500 text-xs font-medium mb-1 uppercase tracking-wide">{brand}</p>
+        <p className="text-gray-500 text-xs font-medium mb-1 uppercase tracking-wide">
+          {brand}
+        </p>
 
         {/* Product Name */}
-        <h3 className="mb-1 text-base font-semibold text-gray-900 line-clamp-1" title={name}>
-          {name}
-        </h3>
+        <Link href={slug ? `/products/${slug}` : "#"} className="block">
+          <h3
+            className="mb-1 text-base font-semibold text-gray-900 line-clamp-1 hover:text-[var(--accent)] transition-colors cursor-pointer"
+            title={name}
+          >
+            {name}
+          </h3>
+        </Link>
 
         {/* Part Number */}
         <p className="text-gray-500 text-xs font-mono mb-3">
@@ -136,9 +138,10 @@ export default function ProductCard({
             inline-flex items-center justify-center w-full h-9 px-4 py-2 
             text-sm font-medium transition-colors rounded-md focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 
             disabled:pointer-events-none disabled:opacity-50
-            ${isAdded 
-              ? "bg-blue-600 text-white hover:bg-blue-700" 
-              : "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
+            ${
+              isAdded
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-900 text-white hover:bg-gray-800 shadow-sm"
             }
           `}
         >
