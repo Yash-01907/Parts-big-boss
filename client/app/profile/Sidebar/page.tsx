@@ -130,7 +130,8 @@ export default function ProfileSidebar() {
           className="
           w-full flex flex-col 
           gap-2 
-          bg-white text-[var(--text-primary)] border border-[var(--border)] rounded-2xl p-4
+          bg-black/50 text-white p-4
+          rounded-xl
         "
         >
           {menuItems.map((item) => {
@@ -145,14 +146,14 @@ export default function ProfileSidebar() {
                           ${
                             isActive
                               ? "text-[var(--accent)] font-bold bg-transparent"
-                              : "text-[var(--text-secondary)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] rounded-xl"
+                              : "text-white hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] rounded-xl"
                           }
                       `}
               >
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active-indicator"
-                    className="absolute left-0 top-1 bottom-1 w-1 bg-[var(--accent)] rounded-r-full"
+                    className="absolute left-0 top-1 bottom-1 w-1 bg-white rounded-r-full"
                     initial={{ opacity: 0, scaleY: 0 }}
                     animate={{ opacity: 1, scaleY: 1 }}
                     transition={{ duration: 0.2, ease: "easeInOut" }}

@@ -108,9 +108,17 @@ export default function VehicleSelector({
     } else {
       // Mode 2: Search (Landing Page)
       const queryParams = new URLSearchParams();
-      queryParams.append("make", selectedMake);
-      queryParams.append("model", selectedModel);
-      queryParams.append("year", selectedYear);
+      queryParams.append("make_id", selectedMake);
+      queryParams.append("model_id", selectedModel);
+
+      // Find the actual year value from the years array using the selected variant_id
+      const selectedYearObj = years.find(
+        (y) => y.variant_id.toString() === selectedYear
+      );
+      if (selectedYearObj) {
+        queryParams.append("year", selectedYearObj.year.toString());
+      }
+
       router.push(`/search?${queryParams.toString()}`);
     }
   };

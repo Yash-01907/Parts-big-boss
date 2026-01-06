@@ -59,11 +59,11 @@ export default function GaragePage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 className={`
-                  group relative flex flex-col overflow-hidden rounded-3xl border transition-all duration-300
+                  group relative flex flex-col overflow-hidden rounded-3xl border transition-all duration-300 backdrop-blur-md
                   ${
                     vehicle.is_active
-                      ? "border-[var(--accent)] bg-[var(--surface)] shadow-[0_0_20px_rgba(0,0,0,0.05)] ring-1 ring-[var(--accent)]"
-                      : "border-[var(--border)] bg-[var(--background)] hover:border-[var(--accent)]/50 hover:shadow-lg"
+                      ? "border-[var(--accent)] bg-[#0f172a]/90 shadow-[0_0_20px_rgba(0,0,0,0.05)] ring-1 ring-[var(--accent)]"
+                      : "border-white/10 bg-[#0f172a]/60 hover:bg-[#0f172a]/80 hover:border-[var(--accent)]/50 hover:shadow-lg"
                   }
                 `}
               >
@@ -86,19 +86,19 @@ export default function GaragePage() {
 
                 {/* Content */}
                 <div className="flex-1 p-6 flex flex-col relative z-10 -mt-12">
-                  <div className="bg-[var(--surface)] backdrop-blur-sm p-4 rounded-xl border border-[var(--border)] shadow-sm">
+                  <div className="bg-[#1e293b]/50 backdrop-blur-md p-4 rounded-xl border border-white/10 shadow-sm">
                     <h3
-                      className="text-xl font-bold text-[var(--foreground)] line-clamp-1"
+                      className="text-xl font-bold text-white line-clamp-1"
                       title={vehicle.nickname || vehicle.model_name || ""}
                     >
                       {vehicle.nickname || vehicle.model_name}
                     </h3>
-                    <p className="text-sm text-[var(--text-secondary)] mt-1">
+                    <p className="text-sm text-gray-300 mt-1">
                       {vehicle.year} {vehicle.make_name} {vehicle.model_name}
                     </p>
 
-                    <div className="mt-4 pt-4 border-t border-[var(--border)] flex items-center justify-between">
-                      <span className="text-xs font-mono text-[var(--text-muted)] bg-[var(--surface-hover)] px-2 py-1 rounded">
+                    <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
+                      <span className="text-xs font-mono text-gray-400 bg-white/5 px-2 py-1 rounded">
                         ID: {vehicle.id}
                       </span>
 

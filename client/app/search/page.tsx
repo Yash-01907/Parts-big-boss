@@ -12,6 +12,10 @@ import Loader from "@/app/components/Loader";
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
+  const makeId = searchParams.get("make_id");
+  const modelId = searchParams.get("model_id");
+  const year = searchParams.get("year");
+
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -22,19 +26,16 @@ function SearchContent() {
       setLoading(true);
       setError("");
       try {
-        // The user specified endpoint: api/products/search/q={query}
-        // But the server route is /api/products/search with query param q
-        // API_BASE_URL is likely http://localhost:5000 from axiosConfig
-        // so we call /products/search
         const response = await api.get(`api/products/search`, {
           params: {
             q: query,
-            // Add default limit if needed, or let server handle it
+            make_id: makeId,
+            model_id: modelId,
+            year: year,
             limit: 50,
           },
         });
 
-        // Response structure: { count, limit, offset, results, filters }
         if (response.data && response.data.results) {
           setProducts(response.data.results);
           setCount(response.data.count);
@@ -50,24 +51,26 @@ function SearchContent() {
       }
     };
 
-    if (query) {
+    if (query || makeId || modelId || year) {
       fetchProducts();
     } else {
-      // If no query, maybe clear products or fetch all?
-      // For now, let's just clear.
       setProducts([]);
       setCount(0);
     }
-  }, [query]);
+  }, [query, makeId, modelId, year]);
 
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 min-h-[60vh]">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 min-h-[60vh]">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
-            {query ? `Search Results for "${query}"` : "Search Products"}
+            {query
+              ? `Search Results for "${query}"`
+              : makeId || modelId
+              ? "Vehicle Search Results"
+              : "Search Products"}
           </h1>
           <p className="text-[var(--text-secondary)]">
             {loading ? "Searching..." : `${count} products found`}

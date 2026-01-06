@@ -1,5 +1,6 @@
 // app/profile/layout.tsx
 import ProfileSidebar from "./Sidebar/page";
+import Navbar from "../components/Sections/Navbar";
 import AuthGuard from "./AuthGuard";
 // Note: transforming motion.div to a standard div for server component
 // or we keep the main content wrapper as a client component if animation is needed.
@@ -14,7 +15,8 @@ export default function ProfileLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="min-h-screen flex flex-col md:flex-row bg-[#FDFDFD]">
+      <Navbar />
+      <div className="min-h-screen flex flex-col md:flex-row bg-[#FDFDFD] px-2 py-3 pt-24">
         {/* SIDEBAR */}
         <ProfileSidebar />
 

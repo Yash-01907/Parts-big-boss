@@ -4,7 +4,6 @@ import ActiveVehicleCard from "../components/Profile/ActiveVehicleCard";
 import RecentOrders from "../components/Profile/RecentOrders";
 import GarageList from "../components/Profile/GarageList";
 import AddVehicleSection from "../components/Profile/AddVehicleSelection";
-
 export default async function ProfileDashboard() {
   // 1. Fetch Data on the Server
   const { garage, orders } = await getProfileData();

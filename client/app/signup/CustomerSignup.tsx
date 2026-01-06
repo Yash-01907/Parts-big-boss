@@ -90,7 +90,8 @@ export default function CustomerSignup() {
       authStore.login({
         id: data.id || 'temp-id',
         email: data.email || email,
-        name: `${firstName} ${lastName}`,
+        first_name: firstName,
+        last_name: lastName,
         type: 'customer',
         token: data.token
       });
