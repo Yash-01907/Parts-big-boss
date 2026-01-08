@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { CloudCog, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { useDebounce } from "../../store/useDebounce";
 import { searchSuggestion } from "../../Data/searchSuggestion";
 

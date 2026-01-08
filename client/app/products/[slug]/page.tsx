@@ -9,6 +9,7 @@ import ProductSummary from "@/app/components/product-components/ProductSummary";
 import CompatibilityTable from "@/app/components/product-components/CompatibilityTable";
 import RelatedProducts from "@/app/components/product-components/RelatedProducts";
 import ProductInfoTabs from "@/app/components/product-components/ProductInfoTabs";
+import Breadcrumbs from "@/app/components/product-components/Breadcrumbs";
 
 // Server-side data fetching
 async function getProduct(slug: string): Promise<ProductDetail | null> {
@@ -130,32 +131,20 @@ export default async function ProductPage({
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-7 pt-20 pb-20">
         {/* Breadcrumb - Clean & Minimal */}
-        <nav
-          className="flex items-center gap-2.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-12"
-          aria-label="Breadcrumb"
-        >
-          <Link
-            href="/"
-            className="hover:text-gray-900 transition-colors text-[14px]"
-          >
-            Home
-          </Link>
-          <ChevronRight size={18} className="opacity-30" />
-          {product.category_name && (
-            <>
-              <Link
-                href={`/search?category_slug=${product.category_slug}`}
-                className="hover:text-gray-900 transition-colors text-[12px]"
-              >
-                {product.category_name}
-              </Link>
-              <ChevronRight size={12} className="text-black" />
-            </>
-          )}
-          <span className="truncate text-[12px] md:max-w-none text-[var(--brand-red)]">
-            {product.title}
-          </span>
-        </nav>
+        <Breadcrumbs
+          className="mb-12"
+          items={[
+            ...(product.category_name
+              ? [
+                  {
+                    label: product.category_name,
+                    href: `/search?category_slug=${product.category_slug}`,
+                  },
+                ]
+              : []),
+            { label: product.title },
+          ]}
+        />
 
         {/* Hero Section */}
         <div className="flex flex-col md:flex-row items-center justify-center xl:gap-24 mb-12 py-2 bg-[var(--surface)] px-4 rounded-xl">

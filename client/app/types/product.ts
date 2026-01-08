@@ -41,7 +41,7 @@ export interface Product {
   title: string;
   price: number;
   part_number: string;
-  image_url: string;
+  image_url: null | string;
   category: string;
   slug: string;
   rating: number;

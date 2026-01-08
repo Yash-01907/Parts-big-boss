@@ -9,6 +9,8 @@ import ProductCard from "@/app/components/product-components/ProductCardVertical
 import { Product } from "@/app/types/product";
 import Loader from "@/app/components/Loader";
 
+import Breadcrumbs from "@/app/components/product-components/Breadcrumbs";
+
 function SearchContent() {
   const searchParams = useSearchParams();
   const query = searchParams.get("q") || "";
@@ -35,7 +37,7 @@ function SearchContent() {
             limit: 50,
           },
         });
-
+        console.log(response.data);
         if (response.data && response.data.results) {
           setProducts(response.data.results);
           setCount(response.data.count);
@@ -59,11 +61,22 @@ function SearchContent() {
     }
   }, [query, makeId, modelId, year]);
 
+  const breadcrumbItems = [
+    {
+      label: query
+        ? "Search Results"
+        : makeId || modelId
+        ? "Vehicle Search"
+        : "Search",
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[var(--surface-hover)]">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 min-h-[60vh]">
+        <Breadcrumbs items={breadcrumbItems} />
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
             {query

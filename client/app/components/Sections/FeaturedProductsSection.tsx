@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Product } from "../../types/product";
 import ProductCard from "../product-components/ProductCardVertical";
-import { FEATURED_PRODUCTS } from "../../Data/productInfo";
+import { fetchFeaturedProducts } from "../../Data/productInfo";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
@@ -40,8 +40,17 @@ export default function FeaturedProductsSection() {
   const itemsPerPage = isMobile
     ? MOBILE_ITEMS_PER_PAGE
     : DESKTOP_ITEMS_PER_PAGE;
+  // Products state
+  const [displayProducts, setDisplayProducts] = useState<Product[]>([]);
 
-  const displayProducts = FEATURED_PRODUCTS.slice(0, limit);
+  // Fetch products
+  useEffect(() => {
+    const loadProducts = async () => {
+      const data = await fetchFeaturedProducts();
+      setDisplayProducts(data);
+    };
+    loadProducts();
+  }, []);
   const totalPages = Math.ceil(displayProducts.length / itemsPerPage);
 
   const currentProducts = displayProducts.slice(
@@ -60,7 +69,6 @@ export default function FeaturedProductsSection() {
   const prev = () => {
     setCurrentIndex((prev) => (prev - 1 + totalPages) % totalPages);
   };
-
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 mb-16 group">
       <div className="flex items-center justify-between mb-8">
@@ -68,7 +76,7 @@ export default function FeaturedProductsSection() {
           Featured Products
         </h2>
         <Link
-          href="/products"
+          href={`/search?q=`}
           className="hidden md:flex items-center text-[var(--accent)] font-semibold hover:text-[var(--accent-hover)] transition-colors"
         >
           View All Products <ArrowRight className="ml-2 w-4 h-4" />
@@ -96,9 +104,9 @@ export default function FeaturedProductsSection() {
                   name={product.title}
                   partNumber={product.part_number}
                   price={product.price}
-                  image={product.image_url}
-                  rating={product.rating}
-                  reviewCount={product.rating_count}
+                  image={null}
+                  rating={3.2}
+                  reviewCount={1406}
                   // You might need to mock these if they aren't in your DB yet
                   inStock={true}
                   brand={product.category || "Generic"}

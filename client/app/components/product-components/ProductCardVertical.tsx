@@ -3,14 +3,14 @@
 import { ShoppingCart, Star, Package, Check } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
-
+import Image from "next/image";
 interface ProductCardProps {
   id: string;
   name: string;
   partNumber: string;
   price: number;
   originalPrice?: number;
-  image: string;
+  image: string | null;
   rating: number;
   reviewCount: number;
   inStock: boolean;
@@ -48,12 +48,12 @@ export default function ProductCard({
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
-
+  console.log(image);
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Section */}
       <div className="relative bg-gray-50 aspect-[4/3]">
-        <img src={image} alt={name} className="w-full h-full object-cover" />
+        <Image src="/Product/p1.png" alt={name} fill />
 
         {/* Discount Badge */}
         {discount > 0 && (

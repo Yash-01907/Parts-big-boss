@@ -46,9 +46,6 @@ const HeroSlide = memo(({ slide, direction, isMobile }: HeroSlideProps) => {
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
 
-        {/* --- Gradient Overlay --- */}
-        {/* <div className="absolute inset-0 bg-gradient-to-tr from-accent/70 via-accent/30 to-transparent opacity-80 transition-opacity duration-500 group-hover:opacity-70" /> */}
-
         {/* --- Content Layer --- */}
         {(slide.title || slide.description) && (
           <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 lg:p-16">
