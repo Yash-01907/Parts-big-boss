@@ -52,7 +52,6 @@ export default function FeaturedProductsSection() {
     loadProducts();
   }, []);
   const totalPages = Math.ceil(displayProducts.length / itemsPerPage);
-
   const currentProducts = displayProducts.slice(
     currentIndex * itemsPerPage,
     (currentIndex + 1) * itemsPerPage
@@ -110,6 +109,7 @@ export default function FeaturedProductsSection() {
                   // You might need to mock these if they aren't in your DB yet
                   inStock={true}
                   brand={product.category || "Generic"}
+                  slug={product.slug}
                 />
               </div>
             ))}

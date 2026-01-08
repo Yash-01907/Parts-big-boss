@@ -33,7 +33,7 @@ export default function ProductCard({
   slug,
 }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
-
+  console.log(slug);
   const handleAddToCart = () => {
     if (isAdded) {
       // Redirect to checkout or cart
@@ -48,7 +48,6 @@ export default function ProductCard({
   const discount = originalPrice
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
-  console.log(image);
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Section */}

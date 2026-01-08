@@ -143,11 +143,11 @@ export default function MerchantSignup() {
       >
         <motion.h2
           variants={variants}
-          className="text-3xl font-bold tracking-tight text-[var(--foreground)]"
+          className="text-3xl font-bold tracking-tight text-[var(--text-primary)]"
         >
           Merchant Registration
         </motion.h2>
-        <motion.p variants={variants} className="text-[var(--text-muted)]">
+        <motion.p variants={variants} className="text-[var(--text-secondary)]">
           Join our network of professional auto parts sellers
         </motion.p>
       </motion.div>
@@ -168,7 +168,7 @@ export default function MerchantSignup() {
               htmlFor="firstName"
               className={`text-sm font-medium transition-colors ${
                 focusedField === "firstName"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -186,18 +186,18 @@ export default function MerchantSignup() {
                 onBlur={() => setFocusedField(null)}
                 className="
                     w-full px-4 py-3 pl-11
-                    bg-[var(--surface)] border border-transparent 
-                    rounded-xl text-[var(--foreground)] 
-                    placeholder:text-[var(--text-muted)]/50
-                    focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                    bg-[var(--surface)] border border-[var(--border)]
+                    rounded-xl text-[var(--text-primary)] 
+                    placeholder:text-[var(--text-secondary)]
+                    focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                     transition-all duration-200
                   "
               />
               <div
                 className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                   focusedField === "firstName"
-                    ? "text-[var(--accent)]"
-                    : "text-[var(--text-muted)]"
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--text-secondary)]"
                 }`}
               >
                 <User size={20} />
@@ -210,7 +210,7 @@ export default function MerchantSignup() {
               htmlFor="lastName"
               className={`text-sm font-medium transition-colors ${
                 focusedField === "lastName"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -228,18 +228,18 @@ export default function MerchantSignup() {
                 onBlur={() => setFocusedField(null)}
                 className="
                     w-full px-4 py-3 pl-11
-                    bg-[var(--surface)] border border-transparent 
-                    rounded-xl text-[var(--foreground)] 
-                    placeholder:text-[var(--text-muted)]/50
-                    focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                    bg-[var(--surface)] border border-[var(--border)]
+                    rounded-xl text-[var(--text-primary)] 
+                    placeholder:text-[var(--text-secondary)]
+                    focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                     transition-all duration-200
                   "
               />
               <div
                 className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                   focusedField === "lastName"
-                    ? "text-[var(--accent)]"
-                    : "text-[var(--text-muted)]"
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--text-secondary)]"
                 }`}
               >
                 <User size={20} />
@@ -260,7 +260,7 @@ export default function MerchantSignup() {
               htmlFor="shopName"
               className={`text-sm font-medium ${
                 focusedField === "shopName"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -276,11 +276,11 @@ export default function MerchantSignup() {
                 placeholder="Auto Parts Co."
                 onFocus={() => setFocusedField("shopName")}
                 onBlur={() => setFocusedField(null)}
-                className="w-full px-4 py-3 pl-11 bg-[var(--surface)] rounded-xl focus:bg-white focus:ring-[var(--accent)]/10"
+                className="w-full px-4 py-3 pl-11 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
               />
               <Building2
                 size={20}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
               />
             </div>
           </div>
@@ -292,7 +292,7 @@ export default function MerchantSignup() {
                 htmlFor="gst"
                 className={`text-sm font-medium ${
                   focusedField === "gst"
-                    ? "text-[var(--accent)]"
+                    ? "text-[var(--primary)]"
                     : "text-[var(--text-secondary)]"
                 }`}
               >
@@ -306,13 +306,13 @@ export default function MerchantSignup() {
                   value={gstNumber}
                   onChange={(e) => setGstNumber(e.target.value)}
                   placeholder="GSTIN..."
-                  className="w-full px-4 py-3 pl-11 bg-[var(--surface)] rounded-xl"
+                  className="w-full px-4 py-3 pl-11 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
                   onFocus={() => setFocusedField("gst")}
                   onBlur={() => setFocusedField(null)}
                 />
                 <FileText
                   size={20}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)]"
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]"
                 />
               </div>
             </div>
@@ -321,7 +321,7 @@ export default function MerchantSignup() {
                 htmlFor="year"
                 className={`text-sm font-medium ${
                   focusedField === "year"
-                    ? "text-[var(--accent)]"
+                    ? "text-[var(--primary)]"
                     : "text-[var(--text-secondary)]"
                 }`}
               >
@@ -334,7 +334,9 @@ export default function MerchantSignup() {
                 value={establishedYear}
                 onChange={(e) => setEstablishedYear(e.target.value)}
                 placeholder="2010"
-                className="w-full px-4 py-3 bg-[var(--surface)] rounded-xl"
+                className="w-full px-4 py-3 bg-[var(--surface)] border border-[var(--border)] rounded-xl text-[var(--text-primary)] focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
+                onFocus={() => setFocusedField("year")}
+                onBlur={() => setFocusedField(null)}
               />
             </div>
           </div>
@@ -345,7 +347,7 @@ export default function MerchantSignup() {
               htmlFor="address"
               className={`text-sm font-medium ${
                 focusedField === "address"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -360,11 +362,11 @@ export default function MerchantSignup() {
                 placeholder="Full street address..."
                 onFocus={() => setFocusedField("address")}
                 onBlur={() => setFocusedField(null)}
-                className="w-full px-4 py-3 pl-11 bg-[var(--surface)] rounded-xl min-h-[80px]"
+                className="w-full px-4 py-3 pl-11 bg-[var(--surface)] border border-[var(--border)] rounded-xl min-h-[80px] text-[var(--text-primary)] focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)] transition-all"
               />
               <MapPin
                 size={20}
-                className="absolute left-3.5 top-3.5 text-[var(--text-muted)]"
+                className="absolute left-3.5 top-3.5 text-[var(--text-secondary)]"
               />
             </div>
           </div>
@@ -382,7 +384,7 @@ export default function MerchantSignup() {
               htmlFor="email"
               className={`text-sm font-medium transition-colors ${
                 focusedField === "email"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -400,18 +402,18 @@ export default function MerchantSignup() {
                 onBlur={() => setFocusedField(null)}
                 className="
                     w-full px-4 py-3 pl-11
-                    bg-[var(--surface)] border border-transparent 
-                    rounded-xl text-[var(--foreground)] 
-                    placeholder:text-[var(--text-muted)]/50
-                    focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                    bg-[var(--surface)] border border-[var(--border)]
+                    rounded-xl text-[var(--text-primary)] 
+                    placeholder:text-[var(--text-secondary)]
+                    focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                     transition-all duration-200
                 "
               />
               <div
                 className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                   focusedField === "email"
-                    ? "text-[var(--accent)]"
-                    : "text-[var(--text-muted)]"
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--text-secondary)]"
                 }`}
               >
                 <Mail size={20} />
@@ -425,7 +427,7 @@ export default function MerchantSignup() {
               htmlFor="phone"
               className={`text-sm font-medium transition-colors ${
                 focusedField === "phone"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -439,21 +441,21 @@ export default function MerchantSignup() {
                   onClick={() => setShowCountryDropdown(!showCountryDropdown)}
                   className="
                            h-[50px] px-3 flex items-center gap-2
-                           bg-[var(--surface)] border border-transparent 
-                           rounded-xl text-[var(--foreground)]
+                           bg-[var(--surface)] border border-[var(--border)]
+                           rounded-xl text-[var(--text-primary)]
                            hover:bg-[var(--surface-hover)] transition-colors
-                           focus:ring-2 focus:ring-[var(--accent)]/10 outline-none
+                           focus:ring-1 focus:ring-[var(--primary)] outline-none
                         "
                 >
                   <span className="text-lg">
                     {COUNTRIES.find((c) => c.code === countryCode)?.flag}
                   </span>
-                  <span className="text-sm font-medium text-[var(--text-secondary)]">
+                  <span className="text-sm font-medium text-[var(--text-primary)]">
                     {countryCode}
                   </span>
                   <ChevronDown
                     size={14}
-                    className={`text-black transition-transform ${
+                    className={`text-[var(--text-secondary)] transition-transform ${
                       showCountryDropdown ? "rotate-180" : ""
                     }`}
                   />
@@ -475,10 +477,10 @@ export default function MerchantSignup() {
                             setCountryCode(country.code);
                             setShowCountryDropdown(false);
                           }}
-                          className="w-full px-3 py-2 flex items-center gap-2 hover:bg-black/5 transition-colors text-left"
+                          className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[var(--surface-hover)] transition-colors text-left"
                         >
                           <span className="text-lg">{country.flag}</span>
-                          <span className="text-sm text-black">
+                          <span className="text-sm text-[var(--text-primary)]">
                             {country.code}
                           </span>
                         </button>
@@ -504,18 +506,18 @@ export default function MerchantSignup() {
                   onBlur={() => setFocusedField(null)}
                   className="
                         w-full h-[50px] px-4 pl-11 pr-24
-                        bg-[var(--surface)] border border-transparent 
-                        rounded-xl text-[var(--foreground)] 
-                        placeholder:text-[var(--text-muted)]/50
-                        focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                        bg-[var(--surface)] border border-[var(--border)]
+                        rounded-xl text-[var(--text-primary)] 
+                        placeholder:text-[var(--text-secondary)]
+                        focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                         transition-all duration-200
                     "
                 />
                 <div
                   className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                     focusedField === "phone"
-                      ? "text-[var(--accent)]"
-                      : "text-[var(--text-muted)]"
+                      ? "text-[var(--primary)]"
+                      : "text-[var(--text-secondary)]"
                   }`}
                 >
                   <Phone size={20} />
@@ -536,8 +538,8 @@ export default function MerchantSignup() {
                                     text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors
                                     ${
                                       isPhoneVerified
-                                        ? "bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-default"
-                                        : "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]"
+                                        ? "bg-[var(--surface-hover)] text-[var(--text-secondary)] cursor-default"
+                                        : "bg-[var(--primary)] text-[var(--text-inverse)] hover:bg-[var(--primary-hover)]"
                                     }
                                 `}
                       >
@@ -564,7 +566,8 @@ export default function MerchantSignup() {
                 className="overflow-hidden space-y-2"
               >
                 <label className="text-sm font-medium text-[var(--text-secondary)]">
-                  Enter OTP Code <span className="text-red-500">*</span>
+                  Enter OTP Code{" "}
+                  <span className="text-[var(--brand-signal)]">*</span>
                 </label>
                 <div className="flex gap-3">
                   {otp.map((digit, index) => (
@@ -581,9 +584,9 @@ export default function MerchantSignup() {
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       className="
                                         w-12 h-12 text-center text-lg font-bold
-                                        bg-[var(--surface)] border border-transparent 
-                                        rounded-lg text-[var(--foreground)] 
-                                        focus:bg-white focus:border-[var(--accent)]/30 focus:ring-2 focus:ring-[var(--accent)]/10
+                                        bg-[var(--surface)] border border-[var(--border)]
+                                        rounded-lg text-[var(--text-primary)] 
+                                        focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                                         transition-all duration-200 outline-none
                                     "
                     />
@@ -599,7 +602,7 @@ export default function MerchantSignup() {
               htmlFor="password"
               className={`text-sm font-medium transition-colors ${
                 focusedField === "password"
-                  ? "text-[var(--accent)]"
+                  ? "text-[var(--primary)]"
                   : "text-[var(--text-secondary)]"
               }`}
             >
@@ -617,18 +620,18 @@ export default function MerchantSignup() {
                 onBlur={() => setFocusedField(null)}
                 className="
                     w-full px-4 py-3 pl-11 pr-11
-                    bg-[var(--surface)] border border-transparent 
-                    rounded-xl text-[var(--foreground)] 
-                    placeholder:text-[var(--text-muted)]/50
-                    focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                    bg-[var(--surface)] border border-[var(--border)]
+                    rounded-xl text-[var(--text-primary)] 
+                    placeholder:text-[var(--text-secondary)]
+                    focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                     transition-all duration-200
                 "
               />
               <div
                 className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
                   focusedField === "password"
-                    ? "text-[var(--accent)]"
-                    : "text-[var(--text-muted)]"
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--text-secondary)]"
                 }`}
               >
                 <Lock size={20} />
@@ -636,7 +639,7 @@ export default function MerchantSignup() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors p-1"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
@@ -652,9 +655,9 @@ export default function MerchantSignup() {
           type="submit"
           className="
             w-full flex items-center justify-center gap-2
-            bg-[var(--accent)] text-white 
+            bg-[var(--primary)] text-[var(--text-inverse)]
             py-3.5 rounded-xl font-bold text-sm tracking-wide
-            shadow-xl shadow-[var(--accent)]/20 hover:shadow-[var(--accent)]/40
+            shadow-lg hover:shadow-xl hover:bg-[var(--primary-hover)]
             disabled:opacity-70 disabled:cursor-not-allowed
             transition-all duration-300
           "
@@ -673,7 +676,7 @@ export default function MerchantSignup() {
         Already have an account?{" "}
         <Link
           href="/login"
-          className="font-bold text-[var(--accent)] hover:underline"
+          className="font-bold text-[var(--primary)] hover:underline"
         >
           Sign in
         </Link>

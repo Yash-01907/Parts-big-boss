@@ -161,6 +161,21 @@ export default function VehicleSelector({
               </option>
             ))}
           </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M19 9l-7 7-7-7"
+              />
+            </svg>
+          </div>
         </div>
 
         {/* MODEL */}
@@ -180,12 +195,25 @@ export default function VehicleSelector({
               </option>
             ))}
           </select>
-          {isLoadingModels && (
-            <Loader2
-              className="absolute right-3 top-3.5 animate-spin text-gray-400"
-              size={16}
-            />
-          )}
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            {isLoadingModels ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            )}
+          </div>
         </div>
 
         {/* YEAR */}
@@ -200,7 +228,6 @@ export default function VehicleSelector({
               {isLoadingYears ? "Loading..." : "Select Year"}
             </option>
             {years.map((item) => (
-              // Value is now the ID (e.g., 1), but User sees "2018"
               <option
                 key={`${item.variant_id}-${item.year}`}
                 value={item.variant_id}
@@ -209,6 +236,25 @@ export default function VehicleSelector({
               </option>
             ))}
           </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
+            {isLoadingYears ? (
+              <Loader2 className="animate-spin" size={20} />
+            ) : (
+              <svg
+                className="h-5 w-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            )}
+          </div>
         </div>
 
         {/* ACTION BUTTON */}

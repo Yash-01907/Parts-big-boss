@@ -26,27 +26,27 @@ export default function ProductInfoTabs({ product }: ProductInfoTabsProps) {
             }}
           />
 
-          <button
+          <div
             onClick={() => setActiveTab("overview")}
-            className={`flex-1 py-4 text-sm font-semibold tracking-wide transition-colors duration-300 ${
+            className={`flex-1 py-4 text-sm font-semibold tracking-wide transition-colors duration-300 text-center ${
               activeTab === "overview"
                 ? "text-black"
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
             Product Overview
-          </button>
+          </div>
 
-          <button
+          <div
             onClick={() => setActiveTab("specs")}
-            className={`flex-1 py-4 text-sm font-semibold tracking-wide transition-colors duration-300 ${
+            className={`flex-1 py-4 text-sm font-semibold tracking-wide transition-colors duration-300 text-center ${
               activeTab === "specs"
                 ? "text-black"
                 : "text-gray-400 hover:text-gray-600"
             }`}
           >
             Technical Details
-          </button>
+          </div>
         </div>
       </div>
 

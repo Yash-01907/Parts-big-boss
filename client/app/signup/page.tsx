@@ -15,7 +15,7 @@ import Loader from "../components/Loader";
 const CustomerSignup = dynamic(() => import("./CustomerSignup"), {
   loading: () => (
     <div className="h-48 flex items-center justify-center">
-      <Loader2 className="animate-spin text-gray-400" />
+      <Loader2 className="animate-spin text-[var(--text-secondary)]" />
     </div>
   ),
   ssr: false,
@@ -72,34 +72,34 @@ export default function SignupPage() {
 
           <div className="space-y-6">
             {/* Signup Type Toggle */}
-            <div className="p-1 bg-[var(--surface)] rounded-2xl flex relative">
+            <div className="p-1.5 bg-[var(--surface-hover)] rounded-xl flex relative border border-[var(--border)]">
               <div
-                className="absolute inset-y-1 bg-[var(--background)] rounded-xl shadow-sm transition-all duration-300 ease-spring"
+                className="absolute inset-y-1.5 bg-[var(--surface)] rounded-lg shadow-sm border border-[var(--border)] transition-all duration-300 ease-out"
                 style={{
-                  width: "calc(50% - 4px)",
-                  left: activeAuthTab === "customer" ? "4px" : "calc(50%)",
+                  width: "calc(50% - 6px)",
+                  left: activeAuthTab === "customer" ? "6px" : "calc(50%)",
                 }}
               />
-              <button
+              <div
                 onClick={() => handleTabChange("customer")}
-                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${
+                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-200 text-center cursor-pointer ${
                   activeAuthTab === "customer"
-                    ? "text-[var(--foreground)]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                    ? "text-[var(--text-primary)]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 Customer
-              </button>
-              <button
+              </div>
+              <div
                 onClick={() => handleTabChange("merchant")}
-                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-xl transition-colors duration-200 ${
+                className={`flex-1 relative z-10 py-2.5 text-sm font-semibold rounded-lg transition-colors duration-200 text-center cursor-pointer ${
                   activeAuthTab === "merchant"
-                    ? "text-[var(--foreground)]"
-                    : "text-[var(--text-muted)] hover:text-[var(--text-secondary)]"
+                    ? "text-[var(--text-primary)]"
+                    : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
                 Merchant
-              </button>
+              </div>
             </div>
           </div>
 
