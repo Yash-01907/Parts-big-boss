@@ -267,3 +267,60 @@ export const getProductBySlug = asyncHandler(async (req, res, next) => {
 
   res.json(product);
 });
+
+export const searchProductById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  if (!id) {
+    return next(new AppError("Invalid id", 400));
+  }
+
+  const query = `
+  SELECT
+    -- 1. Product Core Details
+    p.id,
+    p.title,
+    p.slug,
+    p.part_number,
+    p.price,            -- Remember this is in smallest currency unit (e.g., paise/cents)
+    p.stock_count,
+    p.image_url,
+    p.attributes,       -- Returns the raw JSONB (e.g., {"color": "red", "weight": "2kg"})
+    p.created_at,
+
+    -- 2. Category Details
+    c.name AS category_name,
+    c.slug AS category_slug,
+
+    -- 3. Compatible Vehicles (Aggregated JSON)
+    -- This creates a clean list like: [{ "make": "Honda", "model": "Civic", "years": "2016-2021" }, ...]
+    COALESCE(
+        JSON_AGG(
+            JSON_BUILD_OBJECT(
+                'make', vmk.name,
+                'model', vm.name,
+                'year_from', vv.year_from,
+                'year_to', vv.year_to,
+                'submodel', vv.submodel
+            ) ORDER BY vmk.name, vm.name, vv.year_from DESC
+        ) FILTER (WHERE vmk.id IS NOT NULL), 
+        '[]'::json
+    ) AS compatible_vehicles
+
+FROM products p
+-- Join Category
+LEFT JOIN categories c ON p.category_id = c.id
+
+-- Join Fitment Chain (Product -> Variant -> Model -> Make)
+LEFT JOIN product_vehicle_fitment pvf ON p.id = pvf.product_id
+LEFT JOIN vehicle_variants vv ON pvf.vehicle_variant_id = vv.id
+LEFT JOIN vehicle_models vm ON vv.model_id = vm.id
+LEFT JOIN vehicle_makes vmk ON vm.make_id = vmk.id
+
+-- 4. Filter by ID or Slug
+WHERE p.id = $1  -- OR use: WHERE p.slug = 1
+
+-- Group by Product & Category to allow aggregation
+GROUP BY p.id, c.id;`;
+  const { rows } = await pool.query(query, [id]);
+  res.json(rows[0]);
+});
