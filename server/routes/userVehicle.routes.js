@@ -1,10 +1,11 @@
 import { Router } from "express";
 import { verifyJWT } from "../middleware/verifyJWT.js";
-import { 
-  addVehicle, 
-  getUserVehicles, 
+import {
+  addVehicle,
+  getUserVehicles,
   activateVehicle,
-  getReorderSuggestions 
+  getReorderSuggestions,
+  deleteVehicle,
 } from "../controllers/userVehicle.controller.js";
 
 const router = Router();
@@ -13,9 +14,8 @@ const router = Router();
 router.use(verifyJWT);
 
 // Garage Management
-router.route("/")
-  .get(getUserVehicles)
-  .post(addVehicle);
+router.route("/").get(getUserVehicles).post(addVehicle);
+router.delete("/:id", deleteVehicle);
 
 router.patch("/:id/activate", activateVehicle);
 

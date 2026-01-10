@@ -2,7 +2,6 @@ import { pool } from "../db/db.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 
-
 export const addVehicle = asyncHandler(async (req, res) => {
   const { variantId, nickname } = req.body;
   const userId = req.user.id;
@@ -25,10 +24,10 @@ export const addVehicle = asyncHandler(async (req, res) => {
       RETURNING id, nickname, is_active
     `;
     const result = await client.query(insertQuery, [
-      userId, 
-      variantId, 
-      nickname || "My Vehicle", 
-      isFirstCar // true if first, false otherwise
+      userId,
+      variantId,
+      nickname || "My Vehicle",
+      isFirstCar, // true if first, false otherwise
     ]);
 
     await client.query("COMMIT");
@@ -36,9 +35,10 @@ export const addVehicle = asyncHandler(async (req, res) => {
     res.status(201).json({
       status: "success",
       vehicle: result.rows[0],
-      message: isFirstCar ? "Vehicle added and activated!" : "Vehicle added to garage."
+      message: isFirstCar
+        ? "Vehicle added and activated!"
+        : "Vehicle added to garage.",
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -71,6 +71,41 @@ export const getUserVehicles = asyncHandler(async (req, res) => {
   res.status(200).json(rows);
 });
 
+export const deleteVehicle = asyncHandler(async (req, res) => {
+  const vehicleId = req.params.id;
+  const userId = req.user.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    const result = await client.query(
+      "DELETE FROM user_vehicles WHERE id = $1 AND user_id = $2 RETURNING *",
+      [vehicleId, userId]
+    );
+
+    if (result.rows.length === 0) {
+      throw new AppError("Vehicle not found", 404);
+    }
+
+    // If we deleted the active vehicle, we might want to auto-activate another one?
+    // For now, let's just delete it. The frontend store handles the UI state.
+
+    await client.query("COMMIT");
+
+    res.status(200).json({
+      status: "success",
+      message: "Vehicle removed",
+      id: vehicleId,
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+});
+
 export const activateVehicle = asyncHandler(async (req, res) => {
   const vehicleId = req.params.id;
   const userId = req.user.id;
@@ -99,9 +134,8 @@ export const activateVehicle = asyncHandler(async (req, res) => {
 
     res.status(200).json({
       status: "success",
-      activeVehicleId: result.rows[0].id
+      activeVehicleId: result.rows[0].id,
     });
-
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -117,7 +151,7 @@ export const activateVehicle = asyncHandler(async (req, res) => {
 export const getReorderSuggestions = asyncHandler(async (req, res) => {
   // Logic: Find items bought > 1 time OR items in "Consumable" categories (Filters, Oil, etc.)
   // Note: We use the 'categories' table slug to identify consumables.
-  
+
   const query = `
     SELECT DISTINCT ON (p.id)
       p.id, p.title, p.price, p.image_url, p.part_number,
@@ -138,7 +172,7 @@ export const getReorderSuggestions = asyncHandler(async (req, res) => {
   `;
 
   // Note: For MVP, simply returning *recent purchases* is often enough for a "Buy Again" shelf.
-  // The query above filters for specific categories if your seed data has them. 
+  // The query above filters for specific categories if your seed data has them.
   // If not, remove the `AND (c.slug ...)` block to just show purchase history.
 
   const { rows } = await pool.query(query, [req.user.id]);

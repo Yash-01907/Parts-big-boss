@@ -1,5 +1,5 @@
-import { useSyncExternalStore } from 'react';
-import { UserVehicle } from '../types/vehicle'; // Import the new type
+import { useSyncExternalStore } from "react";
+import { UserVehicle } from "../types/vehicle"; // Import the new type
 
 // Types
 interface User {
@@ -7,7 +7,7 @@ interface User {
   first_name?: string;
   last_name?: string;
   email: string;
-  type: 'customer' | 'merchant';
+  type: "customer" | "merchant";
   token?: string;
   phone?: string;
 }
@@ -15,9 +15,9 @@ interface User {
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  activeAuthTab: 'customer' | 'merchant';
+  activeAuthTab: "customer" | "merchant";
   isInitialized: boolean;
-  
+
   // NEW: Vehicle State
   userGarage: UserVehicle[];
   activeVehicle: UserVehicle | null;
@@ -27,7 +27,7 @@ interface AuthState {
 let authState: AuthState = {
   user: null,
   isAuthenticated: false,
-  activeAuthTab: 'customer',
+  activeAuthTab: "customer",
   isInitialized: false,
   userGarage: [],
   activeVehicle: null,
@@ -35,7 +35,7 @@ let authState: AuthState = {
 
 // Hydrate: Now accepts vehicles too
 export const hydrate = (user: User | null, garage: UserVehicle[] = []) => {
-  const activeCar = garage.find(v => v.is_active) || null;
+  const activeCar = garage.find((v) => v.is_active) || null;
 
   authState = {
     ...authState,
@@ -53,8 +53,8 @@ const listeners = new Set<() => void>();
 // Store Implementation
 export const authStore = {
   get: () => authState,
-  
-  setAuthTab: (tab: 'customer' | 'merchant') => {
+
+  setAuthTab: (tab: "customer" | "merchant") => {
     authState = { ...authState, activeAuthTab: tab };
     emitChange();
   },
@@ -84,29 +84,48 @@ export const authStore = {
 
   // NEW: Vehicle Actions
   setGarage: (garage: UserVehicle[]) => {
-    const activeCar = garage.find(v => v.is_active) || null;
+    const activeCar = garage.find((v) => v.is_active) || null;
     authState = {
       ...authState,
       userGarage: garage,
-      activeVehicle: activeCar
+      activeVehicle: activeCar,
     };
     emitChange();
   },
 
   switchActiveVehicle: (vehicleId: number) => {
     // 1. Update the list locally to reflect the switch
-    const updatedGarage = authState.userGarage.map(v => ({
-        ...v,
-        is_active: v.id === vehicleId
+    const updatedGarage = authState.userGarage.map((v) => ({
+      ...v,
+      is_active: v.id === vehicleId,
     }));
-    
+
     // 2. Set the active object
-    const newActive = updatedGarage.find(v => v.id === vehicleId) || null;
+    const newActive = updatedGarage.find((v) => v.id === vehicleId) || null;
 
     authState = {
-        ...authState,
-        userGarage: updatedGarage,
-        activeVehicle: newActive
+      ...authState,
+      userGarage: updatedGarage,
+      activeVehicle: newActive,
+    };
+    emitChange();
+  },
+
+  removeVehicle: (vehicleId: number) => {
+    const updatedGarage = authState.userGarage.filter(
+      (v) => v.id !== vehicleId
+    );
+
+    // If active vehicle is removed, clear active
+    let newActive = authState.activeVehicle;
+    if (newActive && newActive.id === vehicleId) {
+      newActive = null;
+    }
+
+    authState = {
+      ...authState,
+      userGarage: updatedGarage,
+      activeVehicle: newActive,
     };
     emitChange();
   },
@@ -114,7 +133,7 @@ export const authStore = {
   subscribe: (listener: () => void) => {
     listeners.add(listener);
     return () => listeners.delete(listener);
-  }
+  },
 };
 
 // Helper
@@ -128,7 +147,7 @@ function emitChange() {
 const serverSnapshot: AuthState = {
   user: null,
   isAuthenticated: false,
-  activeAuthTab: 'customer',
+  activeAuthTab: "customer",
   isInitialized: false,
   userGarage: [],
   activeVehicle: null,
@@ -138,5 +157,9 @@ const getServerSnapshot = (): AuthState => serverSnapshot;
 
 // Hook
 export function useAuthStore() {
-  return useSyncExternalStore(authStore.subscribe, authStore.get, getServerSnapshot);
+  return useSyncExternalStore(
+    authStore.subscribe,
+    authStore.get,
+    getServerSnapshot
+  );
 }
