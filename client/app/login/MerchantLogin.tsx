@@ -3,15 +3,25 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, Phone, Check, Loader2, ChevronDown } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowRight,
+  Phone,
+  Check,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
 import { merchantLogin, merchantVerifyPhone } from "../Data/authLoginInfo";
 import { authStore } from "../store/useAuthStore";
 import { useRouter } from "next/navigation";
 
 const COUNTRIES = [
-    { code: '+91', flag: '🇮🇳' },
-    { code: '+1', flag: '🇺🇸' },
-    { code: '+44', flag: '🇬🇧' }
+  { code: "+91", flag: "🇮🇳" },
+  { code: "+1", flag: "🇺🇸" },
+  { code: "+44", flag: "🇬🇧" },
 ];
 
 export default function MerchantLogin() {
@@ -23,8 +33,8 @@ export default function MerchantLogin() {
   // Merchant specific states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
-  const [countryCode, setCountryCode] = useState('+91');
+
+  const [countryCode, setCountryCode] = useState("+91");
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
@@ -35,10 +45,10 @@ export default function MerchantLogin() {
 
   const handleVerifyPhone = async () => {
     if (phoneNumber.length !== 10) return;
-    
+
     setIsVerifying(true);
     setError(null);
-    
+
     // Simulate API call for smooth UI flow
     setTimeout(() => {
       setIsVerifying(false);
@@ -60,7 +70,10 @@ export default function MerchantLogin() {
     }
   };
 
-  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus();
     }
@@ -70,25 +83,26 @@ export default function MerchantLogin() {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const data = await merchantLogin({
         email,
         phone: phoneNumber,
         password,
-        otp: otp.join("")
+        otp: otp.join(""),
       });
 
       authStore.login({
-        id: data.id || 'merchant-id',
+        id: data.id || "merchant-id",
         email: data.email || email,
         phone: phoneNumber,
-        name: data.name,
-        type: 'merchant',
-        token: data.token
+        first_name: data.first_name,
+        last_name: data.last_name,
+        type: "merchant",
+        token: data.token,
       });
 
-      router.push('/dashboard/merchant'); // Redirect to merchant dashboard
+      router.push("/dashboard/merchant"); // Redirect to merchant dashboard
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {
@@ -103,13 +117,16 @@ export default function MerchantLogin() {
 
   return (
     <div className="w-full max-w-[420px] space-y-10">
-      <motion.div 
-         initial="hidden" 
-         animate="visible" 
-         transition={{ staggerChildren: 0.1 }}
-         className="space-y-2"
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        transition={{ staggerChildren: 0.1 }}
+        className="space-y-2"
       >
-        <motion.h2 variants={variants} className="text-3xl font-bold tracking-tight text-[var(--foreground)]">
+        <motion.h2
+          variants={variants}
+          className="text-3xl font-bold tracking-tight text-[var(--foreground)]"
+        >
           Merchant Portal
         </motion.h2>
         <motion.p variants={variants} className="text-[var(--text-muted)]">
@@ -118,20 +135,23 @@ export default function MerchantLogin() {
       </motion.div>
 
       {/* Form */}
-      <motion.form 
+      <motion.form
         variants={variants}
         initial="hidden"
         animate="visible"
         transition={{ delay: 0.2 }}
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
         className="space-y-6"
       >
-        
         {/* Email Field */}
         <div className="space-y-2">
-          <label 
-            htmlFor="email" 
-            className={`text-sm font-medium transition-colors ${focusedField === 'email' ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
+          <label
+            htmlFor="email"
+            className={`text-sm font-medium transition-colors ${
+              focusedField === "email"
+                ? "text-[var(--primary)]"
+                : "text-[var(--text-secondary)]"
+            }`}
           >
             Email
           </label>
@@ -143,75 +163,95 @@ export default function MerchantLogin() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="merchant@business.com"
-              onFocus={() => setFocusedField('email')}
+              onFocus={() => setFocusedField("email")}
               onBlur={() => setFocusedField(null)}
               className="
                 w-full px-4 py-3 pl-11
-                bg-[var(--surface)] border border-transparent 
-                rounded-xl text-[var(--foreground)] 
-                placeholder:text-[var(--text-muted)]/50
-                focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                bg-[var(--surface)] border border-[var(--border)]
+                rounded-xl text-[var(--text-primary)] 
+                placeholder:text-[var(--text-secondary)]
+                focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                 transition-all duration-200
               "
             />
-            <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${focusedField === 'email' ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}>
+            <div
+              className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                focusedField === "email"
+                  ? "text-[var(--primary)]"
+                  : "text-[var(--text-secondary)]"
+              }`}
+            >
               <Mail size={20} />
             </div>
           </div>
         </div>
 
         <div className="space-y-2 relative z-20">
-          <label 
-            htmlFor="phone" 
-            className={`text-sm font-medium transition-colors ${focusedField === 'phone' ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
+          <label
+            htmlFor="phone"
+            className={`text-sm font-medium transition-colors ${
+              focusedField === "phone"
+                ? "text-[var(--primary)]"
+                : "text-[var(--text-secondary)]"
+            }`}
           >
             Phone Number
           </label>
           <div className="relative flex gap-2">
-            
             {/* Country Code Dropdown */}
             <div className="relative">
-                <button
-                    type="button"
-                    onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                    className="
+              <button
+                type="button"
+                onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                className="
                        h-[50px] px-3 flex items-center gap-2
-                       bg-[var(--surface)] border border-transparent 
-                       rounded-xl text-[var(--foreground)]
+                       bg-[var(--surface)] border border-[var(--border)]
+                       rounded-xl text-[var(--text-primary)]
                        hover:bg-[var(--surface-hover)] transition-colors
-                       focus:ring-2 focus:ring-[var(--accent)]/10 outline-none
+                       focus:ring-1 focus:ring-[var(--primary)] outline-none
                     "
-                >
-                    <span className="text-lg">{COUNTRIES.find(c => c.code === countryCode)?.flag}</span>
-                    <span className="text-sm font-medium text-[var(--text-secondary)]">{countryCode}</span>
-                    <ChevronDown size={14} className={`text-black transition-transform ${showCountryDropdown ? 'rotate-180' : ''}`} />
-                </button>
+              >
+                <span className="text-lg">
+                  {COUNTRIES.find((c) => c.code === countryCode)?.flag}
+                </span>
+                <span className="text-sm font-medium text-[var(--text-primary)]">
+                  {countryCode}
+                </span>
+                <ChevronDown
+                  size={14}
+                  className={`text-[var(--text-secondary)] transition-transform ${
+                    showCountryDropdown ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
 
-                <AnimatePresence>
-                    {showCountryDropdown && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: 5 }}
-                            className="absolute top-full left-0 mt-2 w-32 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden z-50 py-1"
-                        >
-                            {COUNTRIES.map((country) => (
-                                <button
-                                    key={country.code}
-                                    type="button"
-                                    onClick={() => {
-                                        setCountryCode(country.code);
-                                        setShowCountryDropdown(false);
-                                    }}
-                                    className="w-full px-3 py-2 flex items-center gap-2 hover:bg-black/5 transition-colors text-left"
-                                >
-                                    <span className="text-lg">{country.flag}</span>
-                                    <span className="text-sm text-black">{country.code}</span>
-                                </button>
-                            ))}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+              <AnimatePresence>
+                {showCountryDropdown && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 5 }}
+                    className="absolute top-full left-0 mt-2 w-32 bg-[var(--surface)] border border-[var(--border)] rounded-xl shadow-xl overflow-hidden z-50 py-1"
+                  >
+                    {COUNTRIES.map((country) => (
+                      <button
+                        key={country.code}
+                        type="button"
+                        onClick={() => {
+                          setCountryCode(country.code);
+                          setShowCountryDropdown(false);
+                        }}
+                        className="w-full px-3 py-2 flex items-center gap-2 hover:bg-[var(--surface-hover)] transition-colors text-left"
+                      >
+                        <span className="text-lg">{country.flag}</span>
+                        <span className="text-sm text-[var(--text-primary)]">
+                          {country.code}
+                        </span>
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             <div className="relative flex-1">
@@ -222,52 +262,59 @@ export default function MerchantLogin() {
                 maxLength={10}
                 value={phoneNumber}
                 onChange={(e) => {
-                  const val = e.target.value.replace(/\D/g, ''); // only numbers
+                  const val = e.target.value.replace(/\D/g, ""); // only numbers
                   if (val.length <= 10) setPhoneNumber(val);
                 }}
                 placeholder="1234567890"
-                onFocus={() => setFocusedField('phone')}
+                onFocus={() => setFocusedField("phone")}
                 onBlur={() => setFocusedField(null)}
                 className="
                   w-full h-[50px] px-4 pl-11 pr-24
-                  bg-[var(--surface)] border border-transparent 
-                  rounded-xl text-[var(--foreground)] 
-                  placeholder:text-[var(--text-muted)]/50
-                  focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                  bg-[var(--surface)] border border-[var(--border)]
+                  rounded-xl text-[var(--text-primary)] 
+                  placeholder:text-[var(--text-secondary)]
+                  focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                   transition-all duration-200
                 "
               />
-              <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${focusedField === 'phone' ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}>
+              <div
+                className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                  focusedField === "phone"
+                    ? "text-[var(--primary)]"
+                    : "text-[var(--text-secondary)]"
+                }`}
+              >
                 <Phone size={20} />
               </div>
 
               {/* Verify Button */}
               <div className="absolute right-2 top-1/2 -translate-y-1/2">
-                  <AnimatePresence>
-                      {phoneNumber.length === 10 && (
-                          <motion.button
-                              initial={{ opacity: 0, scale: 0.8 }}
-                              animate={{ opacity: 1, scale: 1 }}
-                              exit={{ opacity: 0, scale: 0.8 }}
-                              type="button"
-                              onClick={handleVerifyPhone}
-                              disabled={isVerifying || isPhoneVerified}
-                              className={`
+                <AnimatePresence>
+                  {phoneNumber.length === 10 && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      type="button"
+                      onClick={handleVerifyPhone}
+                      disabled={isVerifying || isPhoneVerified}
+                      className={`
                                   text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors
-                                  ${isPhoneVerified 
-                                      ? 'bg-[var(--surface-hover)] text-[var(--text-muted)] cursor-default' 
-                                      : 'bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)]'
+                                  ${
+                                    isPhoneVerified
+                                      ? "bg-[var(--surface-hover)] text-[var(--text-secondary)] cursor-default"
+                                      : "bg-[var(--primary)] text-[var(--text-inverse)] hover:bg-[var(--primary-hover)]"
                                   }
                               `}
-                          >
-                              {isVerifying ? (
-                                  <Loader2 size={14} className="animate-spin" />
-                              ) : (
-                                  "Verify"
-                              )}
-                          </motion.button>
+                    >
+                      {isVerifying ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        "Verify"
                       )}
-                  </AnimatePresence>
+                    </motion.button>
+                  )}
+                </AnimatePresence>
               </div>
             </div>
           </div>
@@ -275,53 +322,59 @@ export default function MerchantLogin() {
 
         {/* OTP Field - Appears after verification */}
         <AnimatePresence>
-            {isPhoneVerified && (
-                <motion.div 
-                    initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    animate={{ opacity: 1, height: 'auto', marginBottom: 24 }}
-                    exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                    className="overflow-hidden space-y-2"
-                >
-                    <label className="text-sm font-medium text-[var(--text-secondary)]">
-                        Enter OTP Code <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-3">
-                        {otp.map((digit, index) => (
-                            <input
-                                key={index}
-                                ref={el => { otpInputRefs.current[index] = el }}
-                                type="text"
-                                maxLength={1}
-                                required
-                                value={digit}
-                                onChange={(e) => handleOtpChange(index, e.target.value)}
-                                onKeyDown={(e) => handleKeyDown(index, e)}
-                                className="
+          {isPhoneVerified && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+              animate={{ opacity: 1, height: "auto", marginBottom: 24 }}
+              exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+              className="overflow-hidden space-y-2"
+            >
+              <label className="text-sm font-medium text-[var(--text-secondary)]">
+                Enter OTP Code <span className="text-red-500">*</span>
+              </label>
+              <div className="flex gap-3">
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      otpInputRefs.current[index] = el;
+                    }}
+                    type="text"
+                    maxLength={1}
+                    required
+                    value={digit}
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
+                    className="
                                     w-12 h-12 text-center text-lg font-bold
-                                    bg-[var(--surface)] border border-transparent 
-                                    rounded-lg text-[var(--foreground)] 
-                                    focus:bg-white focus:border-[var(--accent)]/30 focus:ring-2 focus:ring-[var(--accent)]/10
+                                    bg-[var(--surface)] border border-[var(--border)]
+                                    rounded-lg text-[var(--text-primary)] 
+                                    focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                                     transition-all duration-200 outline-none
                                 "
-                            />
-                        ))}
-                    </div>
-                </motion.div>
-            )}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
         </AnimatePresence>
 
         {/* Password Field */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <label 
-              htmlFor="password" 
-              className={`text-sm font-medium transition-colors ${focusedField === 'password' ? 'text-[var(--accent)]' : 'text-[var(--text-secondary)]'}`}
+            <label
+              htmlFor="password"
+              className={`text-sm font-medium transition-colors ${
+                focusedField === "password"
+                  ? "text-[var(--primary)]"
+                  : "text-[var(--text-secondary)]"
+              }`}
             >
               Password
             </label>
-            <Link 
-              href="/forgot-password" 
-              className="text-xs font-semibold text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
+            <Link
+              href="/forgot-password"
+              className="text-xs font-semibold text-[var(--text-primary)] hover:text-[var(--text-secondary)] transition-colors"
             >
               Forgot password?
             </Link>
@@ -334,34 +387,40 @@ export default function MerchantLogin() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              onFocus={() => setFocusedField('password')}
+              onFocus={() => setFocusedField("password")}
               onBlur={() => setFocusedField(null)}
               className="
                 w-full px-4 py-3 pl-11 pr-11
-                bg-[var(--surface)] border border-transparent 
-                rounded-xl text-[var(--foreground)] 
-                placeholder:text-[var(--text-muted)]/50
-                focus:bg-white focus:border-[var(--accent)]/30 focus:ring-4 focus:ring-[var(--accent)]/10
+                bg-[var(--surface)] border border-[var(--border)]
+                rounded-xl text-[var(--text-primary)] 
+                placeholder:text-[var(--text-secondary)]
+                focus:bg-[var(--surface)] focus:border-[var(--primary)] focus:ring-1 focus:ring-[var(--primary)]
                 transition-all duration-200
               "
             />
-            <div className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${focusedField === 'password' ? 'text-[var(--accent)]' : 'text-[var(--text-muted)]'}`}>
+            <div
+              className={`absolute left-3.5 top-1/2 -translate-y-1/2 transition-colors duration-200 ${
+                focusedField === "password"
+                  ? "text-[var(--primary)]"
+                  : "text-[var(--text-secondary)]"
+              }`}
+            >
               <Lock size={20} />
             </div>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--foreground)] transition-colors p-1"
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors p-1"
             >
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
         </div>
-        
+
         {error && (
-            <div className="p-3 text-sm text-red-500 bg-red-500/10 rounded-xl">
-                {error}
-            </div>
+          <div className="p-3 text-sm text-red-500 bg-red-500/10 rounded-xl">
+            {error}
+          </div>
         )}
 
         {/* Submit Button */}
@@ -372,9 +431,9 @@ export default function MerchantLogin() {
           type="submit"
           className="
             w-full flex items-center justify-center gap-2
-            bg-[var(--accent)] text-white 
+            bg-[var(--primary)] text-[var(--text-inverse)]
             py-3.5 rounded-xl font-bold text-sm tracking-wide
-            shadow-xl shadow-[var(--accent)]/20 hover:shadow-[var(--accent)]/40
+            shadow-lg hover:shadow-xl hover:bg-[var(--primary-hover)]
             disabled:opacity-70 disabled:cursor-not-allowed
             transition-all duration-300
           "
@@ -391,14 +450,13 @@ export default function MerchantLogin() {
 
       <p className="text-center text-sm text-[var(--text-secondary)]">
         Want to become a merchant?{" "}
-        <Link 
-          href="/signup" 
+        <Link
+          href="/signup"
           className="font-bold text-[var(--accent)] hover:underline"
         >
           Sign up for free
         </Link>
       </p>
-
-    </div>  
+    </div>
   );
 }

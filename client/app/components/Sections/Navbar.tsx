@@ -7,8 +7,12 @@ import { Menu } from "lucide-react";
 import SearchBar from "../Navbar/SearchBar";
 import CartButton from "../Navbar/CartButton";
 import AccountButton from "../Navbar/AccountButton";
-import MobileMenu from "../Navbar/MobileMenu";
 import NavItem from "../Navbar/NavItem";
+import dynamic from "next/dynamic";
+
+const MobileMenu = dynamic(() => import("../Navbar/MobileMenu"), {
+  ssr: false,
+});
 
 // example imports – adjust paths as needed
 import {
@@ -32,10 +36,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-black backdrop-blur-xl shadow-sm "
-          : "bg-black"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-2 ${
+        isScrolled ? "bg-black  shadow-sm " : "bg-black"
       }`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -45,7 +47,7 @@ export default function Navbar() {
             <div className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--accent)] text-white font-bold">
               P
             </div>
-            <span className="hidden sm:inline font-semibold text-white text-2xl">
+            <span className="hidden sm:inline font-semibold text-white text-3xl">
               PartsBigBoss
             </span>
           </Link>

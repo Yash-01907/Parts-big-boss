@@ -47,7 +47,7 @@
 //     limit: limitInt,
 //     offset: offsetInt,
 //   });
-  
+
 //   const result = await searchProductsService({
 //     makeId,
 //     modelId,
@@ -71,13 +71,11 @@
 //   });
 // });
 
-
 import asyncHandler from "../utils/asyncHandler.js";
 import AppError from "../utils/appError.js";
 import { searchWithMeili } from "../services/searchProductMeili.js";
 import { pool } from "../db/db.js";
 import redisClient from "../db/redisClient.js";
-
 
 export const getFeaturedProducts = asyncHandler(async (req, res) => {
   const cacheKey = "products:featured";
@@ -121,7 +119,6 @@ export const getFeaturedProducts = asyncHandler(async (req, res) => {
 
   res.json(rows);
 });
-
 
 export const searchProducts = asyncHandler(async (req, res, next) => {
   const {
@@ -200,4 +197,130 @@ export const searchProducts = asyncHandler(async (req, res, next) => {
       category_slug,
     },
   });
+});
+
+// Get single product by slug with full details
+export const getProductBySlug = asyncHandler(async (req, res, next) => {
+  const { slug } = req.params;
+
+  if (!slug) {
+    return next(new AppError("Product slug is required", 400));
+  }
+
+  // Try Redis cache first
+  const cacheKey = `product:${slug}`;
+  const cachedProduct = await redisClient.get(cacheKey);
+
+  if (cachedProduct) {
+    return res.json(JSON.parse(cachedProduct));
+  }
+
+  // Fetch product with category and compatible vehicles
+  const query = `
+    SELECT 
+      p.id,
+      p.title,
+      p.slug,
+      p.part_number,
+      p.price,
+      p.stock_count,
+      p.image_url,
+      p.attributes,
+      p.created_at,
+      p.updated_at,
+      c.id as category_id,
+      c.name as category_name,
+      c.slug as category_slug,
+      COALESCE(
+        json_agg(
+          DISTINCT jsonb_build_object(
+            'variant_id', vv.id,
+            'make_name', vm.name,
+            'model_name', vmo.name,
+            'year_from', vv.year_from,
+            'year_to', vv.year_to,
+            'submodel', vv.submodel
+          )
+        ) FILTER (WHERE vv.id IS NOT NULL),
+        '[]'
+      ) as compatible_vehicles
+    FROM products p
+    LEFT JOIN categories c ON p.category_id = c.id
+    LEFT JOIN product_vehicle_fitment pvf ON p.id = pvf.product_id
+    LEFT JOIN vehicle_variants vv ON pvf.vehicle_variant_id = vv.id
+    LEFT JOIN vehicle_models vmo ON vv.model_id = vmo.id
+    LEFT JOIN vehicle_makes vm ON vmo.make_id = vm.id
+    WHERE p.slug = $1
+    GROUP BY p.id, c.id, c.name, c.slug
+  `;
+
+  const { rows } = await pool.query(query, [slug]);
+
+  if (rows.length === 0) {
+    return next(new AppError("Product not found", 404));
+  }
+
+  const product = rows[0];
+
+  // Cache for 1 hour
+  await redisClient.set(cacheKey, JSON.stringify(product), "EX", 3600);
+
+  res.json(product);
+});
+
+export const searchProductById = asyncHandler(async (req, res, next) => {
+  const { id } = req.params;
+  if (!id) {
+    return next(new AppError("Invalid id", 400));
+  }
+
+  const query = `
+  SELECT
+    -- 1. Product Core Details
+    p.id,
+    p.title,
+    p.slug,
+    p.part_number,
+    p.price,            -- Remember this is in smallest currency unit (e.g., paise/cents)
+    p.stock_count,
+    p.image_url,
+    p.attributes,       -- Returns the raw JSONB (e.g., {"color": "red", "weight": "2kg"})
+    p.created_at,
+
+    -- 2. Category Details
+    c.name AS category_name,
+    c.slug AS category_slug,
+
+    -- 3. Compatible Vehicles (Aggregated JSON)
+    -- This creates a clean list like: [{ "make": "Honda", "model": "Civic", "years": "2016-2021" }, ...]
+    COALESCE(
+        JSON_AGG(
+            JSON_BUILD_OBJECT(
+                'make', vmk.name,
+                'model', vm.name,
+                'year_from', vv.year_from,
+                'year_to', vv.year_to,
+                'submodel', vv.submodel
+            ) ORDER BY vmk.name, vm.name, vv.year_from DESC
+        ) FILTER (WHERE vmk.id IS NOT NULL), 
+        '[]'::json
+    ) AS compatible_vehicles
+
+FROM products p
+-- Join Category
+LEFT JOIN categories c ON p.category_id = c.id
+
+-- Join Fitment Chain (Product -> Variant -> Model -> Make)
+LEFT JOIN product_vehicle_fitment pvf ON p.id = pvf.product_id
+LEFT JOIN vehicle_variants vv ON pvf.vehicle_variant_id = vv.id
+LEFT JOIN vehicle_models vm ON vv.model_id = vm.id
+LEFT JOIN vehicle_makes vmk ON vm.make_id = vmk.id
+
+-- 4. Filter by ID or Slug
+WHERE p.id = $1  -- OR use: WHERE p.slug = 1
+
+-- Group by Product & Category to allow aggregation
+GROUP BY p.id, c.id;`;
+  const { rows } = await pool.query(query, [id]);
+  res.json(rows[0]);
 });
