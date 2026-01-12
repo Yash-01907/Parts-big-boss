@@ -15,7 +15,6 @@ import {
   ArrowLeft,
   Menu,
   X,
-  Home,
 } from "lucide-react";
 import { toast } from "sonner";
 import { logoutUser } from "@/app/Data/authLoginInfo";
@@ -41,7 +40,6 @@ export default function ProfileSidebar() {
   };
 
   const menuItems = [
-    { href: "/", label: "Home", icon: Home },
     { href: "/profile", label: "Dashboard", icon: LayoutDashboard },
     { href: "/profile/garage", label: "Garage", icon: Car },
     { href: "/profile/wishlist", label: "Wishlist", icon: Heart },
@@ -126,12 +124,22 @@ export default function ProfileSidebar() {
         sticky top-24 z-30
       "
       >
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-black/60 hover:text-black transition-colors mb-4 pl-2"
+        >
+          <ArrowLeft size={20} />
+          <span className="font-medium text-sm">Home</span>
+        </Link>
+
         <nav
           className="
           w-full flex flex-col 
           gap-2 
-          bg-black/50 text-white p-4
+          text-black p-4
+          border border-black/50
           rounded-xl
+          shadow-sm
         "
         >
           {menuItems.map((item) => {
@@ -146,14 +154,14 @@ export default function ProfileSidebar() {
                           ${
                             isActive
                               ? "text-[var(--accent)] font-bold bg-transparent"
-                              : "text-white hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] rounded-xl"
+                              : "text-black hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] rounded-xl"
                           }
                       `}
               >
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active-indicator"
-                    className="absolute left-0 top-1 bottom-1 w-1 bg-white rounded-r-full"
+                    className="absolute left-0 top-1 bottom-1 w-1 bg-black rounded-r-full"
                     initial={{ opacity: 0, scaleY: 0 }}
                     animate={{ opacity: 1, scaleY: 1 }}
                     transition={{ duration: 0.2, ease: "easeInOut" }}
