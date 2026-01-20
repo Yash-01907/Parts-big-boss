@@ -35,7 +35,7 @@ let authState: AuthState = {
 
 // Hydrate: Now accepts vehicles too
 export const hydrate = (user: User | null, garage: UserVehicle[] = []) => {
-  const activeCar = garage.find((v) => v.is_active) || null;
+  const activeCar = garage.find((v) => v.shop_for) || null;
 
   authState = {
     ...authState,
@@ -84,7 +84,7 @@ export const authStore = {
 
   // NEW: Vehicle Actions
   setGarage: (garage: UserVehicle[]) => {
-    const activeCar = garage.find((v) => v.is_active) || null;
+    const activeCar = garage.find((v) => v.shop_for) || null;
     authState = {
       ...authState,
       userGarage: garage,
@@ -97,7 +97,7 @@ export const authStore = {
     // 1. Update the list locally to reflect the switch
     const updatedGarage = authState.userGarage.map((v) => ({
       ...v,
-      is_active: v.id === vehicleId,
+      shop_for: v.id === vehicleId,
     }));
 
     // 2. Set the active object
