@@ -94,7 +94,7 @@ export default function ProfileSidebar() {
                     flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
                     ${
                       isActive
-                        ? "bg-[var(--accent)] text-white font-bold"
+                        ? "bg-white text-zinc-950 font-semibold"
                         : "text-white/70 hover:text-white hover:bg-white/10"
                     }
                   `}
@@ -118,80 +118,88 @@ export default function ProfileSidebar() {
       {/* ================= DESKTOP VIEW (>= md) ================= */}
       <aside
         className="
-        hidden md:flex
-        w-64 lg:w-72 
-        flex-col
-        sticky top-24 z-30
-      "
-      >
-        <Link
-          href="/"
-          className="flex items-center gap-2 text-black/60 hover:text-black transition-colors mb-4 pl-2"
-        >
-          <ArrowLeft size={20} />
-          <span className="font-medium text-sm">Home</span>
-        </Link>
-
-        <nav
-          className="
-          w-full flex flex-col 
-          gap-2 
-          text-black p-4
-          border border-black/50
-          rounded-xl
-          shadow-sm
+          hidden md:flex
+          w-64 lg:w-72 
+          flex-col
+          sticky top-0
+          self-start
+          h-screen
+          pt-24
+          pb-6
+          z-30
         "
-        >
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`
-                          relative flex items-center gap-3 px-4 py-3 rounded-r-xl transition-all duration-200 group
-                          ${
-                            isActive
-                              ? "text-[var(--accent)] font-bold bg-transparent"
-                              : "text-black hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)] rounded-xl"
-                          }
-                      `}
-              >
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active-indicator"
-                    className="absolute left-0 top-1 bottom-1 w-1 bg-black rounded-r-full"
-                    initial={{ opacity: 0, scaleY: 0 }}
-                    animate={{ opacity: 1, scaleY: 1 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                  />
-                )}
-
-                <item.icon
-                  size={20}
-                  className={`z-10 transition-transform duration-300 ${
-                    isActive ? "scale-110" : "group-hover:scale-110"
-                  }`}
-                />
-                <span className="text-base z-10">{item.label}</span>
-              </Link>
-            );
-          })}
-
-          <div className="h-px bg-[var(--border)] my-2" />
-
-          <button
-            onClick={handleLogout}
-            className="
-               flex items-center gap-3 px-4 py-3 rounded-xl 
-              text-red-500 hover:bg-red-50 transition-all duration-200 w-full text-left
-          "
+      >
+        <div className="flex flex-col h-full overflow-y-auto scrollbar-none">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-black/60 hover:text-black transition-colors mb-4 pl-2 shrink-0"
           >
-            <LogOut size={20} />
-            <span className="font-medium">Sign Out</span>
-          </button>
-        </nav>
+            <ArrowLeft size={20} />
+            <span className="font-medium text-sm">Home</span>
+          </Link>
+
+          <nav
+            className="
+              w-full flex flex-col 
+              gap-2 
+              text-black p-4
+              bg-white
+              border border-zinc-200
+              rounded-2xl
+              shadow-sm
+            "
+          >
+            {menuItems.map((item) => {
+              const isActive = pathname === item.href;
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`
+                  relative flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group
+                  ${
+                    isActive
+                      ? "text-zinc-950 font-semibold bg-zinc-100"
+                      : "text-zinc-600 hover:bg-zinc-50 hover:text-zinc-950"
+                  }
+                `}
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active-indicator"
+                      className="absolute left-0 top-2 bottom-2 w-1 bg-zinc-950 rounded-r-full"
+                      initial={{ opacity: 0, scaleY: 0 }}
+                      animate={{ opacity: 1, scaleY: 1 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                    />
+                  )}
+
+                  <item.icon
+                    size={20}
+                    className={`z-10 transition-transform duration-300 ${
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    }`}
+                  />
+                  <span className="text-base z-10">{item.label}</span>
+                </Link>
+              );
+            })}
+
+            <div className="h-px bg-zinc-200 my-2" />
+
+            <button
+              onClick={handleLogout}
+              className="
+                flex items-center gap-3 px-4 py-3 rounded-xl 
+                text-red-500 hover:bg-red-50 transition-all duration-200 w-full text-left
+              "
+            >
+              <LogOut size={20} />
+              <span className="font-medium">Sign Out</span>
+            </button>
+          </nav>
+        </div>
       </aside>
     </>
   );
