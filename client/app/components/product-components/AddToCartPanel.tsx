@@ -11,13 +11,20 @@ interface AddToCartPanelProps {
   inStock: boolean;
 }
 
+import { cartStore } from "../../store/useCartStore";
+import { toast } from "sonner";
+
+// ... existing imports
+
 export default function AddToCartPanel({
   productId,
   productTitle,
   price,
   stockCount,
   inStock,
-}: AddToCartPanelProps) {
+  image, // Add image prop
+}: AddToCartPanelProps & { image: string }) {
+  // Update props interface
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -34,17 +41,17 @@ export default function AddToCartPanel({
 
     setIsAdding(true);
     try {
-      // TODO: Implement actual cart API call
-      console.log(`Adding ${quantity} of product ${productId} to cart`);
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 500));
-
-      // Show success feedback
-      alert(`Added ${quantity} item(s) to cart!`);
+      await cartStore.addItem({
+        productId,
+        quantity,
+        price,
+        title: productTitle,
+        image,
+      });
+      // Success toast is handled in the store
     } catch (error) {
       console.error("Failed to add to cart:", error);
-      alert("Failed to add to cart. Please try again.");
+      // Error toast is handled in the store
     } finally {
       setIsAdding(false);
     }
@@ -79,7 +86,7 @@ export default function AddToCartPanel({
     // TODO: Implement wishlist API call
     console.log(
       `${isWishlisted ? "Removed from" : "Added to"} wishlist:`,
-      productId
+      productId,
     );
   };
 
@@ -148,7 +155,7 @@ export default function AddToCartPanel({
 
             <button
               onClick={handleShare}
-              className="flex h-[3.75rem] w-[3.75rem] shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-all"
+              className="flex h-15 w-15 shrink-0 items-center justify-center rounded-xl border border-gray-200 text-gray-600 hover:border-gray-900 hover:text-gray-900 transition-all"
               title="Share"
             >
               <Share2 size={24} />

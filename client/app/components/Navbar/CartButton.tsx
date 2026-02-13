@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ShoppingCart } from "lucide-react";
-import { useCartCount } from "../../store/useCartCount";
+import { useCartCount } from "../../store/useCartStore";
 
 export default function CartButton() {
   const cartCount = useCartCount();

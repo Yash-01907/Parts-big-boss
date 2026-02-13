@@ -57,6 +57,7 @@ export default function ProductSummary({
           price={product.price}
           stockCount={product.stock_count}
           inStock={inStock}
+          image={product.image_url || "/placeholder.png"}
         />
       </div>
 

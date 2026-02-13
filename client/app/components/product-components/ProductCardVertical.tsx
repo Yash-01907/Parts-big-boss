@@ -18,8 +18,12 @@ interface ProductCardProps {
   brand: string;
   slug?: string;
 }
-import { cartStore } from "@/app/store/useCartCount";
+import { cartStore } from "@/app/store/useCartStore";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
 export default function ProductCard({
+  id,
   name,
   partNumber,
   price,
@@ -33,16 +37,27 @@ export default function ProductCard({
   slug,
 }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
-  console.log(slug);
-  const handleAddToCart = () => {
+  const router = useRouter();
+
+  const handleAddToCart = async () => {
     if (isAdded) {
-      // Redirect to checkout or cart
-      window.location.href = "/cart"; // Or use router.push if using useRouter
+      router.push("/cart");
       return;
     }
-    setIsAdded(true);
-    cartStore.increment();
-    // No timeout, keeps "Buy Now" state
+
+    try {
+      await cartStore.addItem({
+        productId: Number(id),
+        quantity: 1,
+        price,
+        title: name,
+        image: image || "",
+      });
+      setIsAdded(true);
+      // Toast is handled in store, but we can add specific behavior here if needed
+    } catch (error) {
+      console.error("Failed to add to cart context", error);
+    }
   };
 
   const discount = originalPrice
@@ -51,7 +66,7 @@ export default function ProductCard({
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow duration-300">
       {/* Image Section */}
-      <div className="relative bg-gray-50 aspect-[4/3]">
+      <div className="relative bg-gray-50 aspect-4/3">
         <Image src="/Product/p1.png" alt={name} fill />
 
         {/* Discount Badge */}

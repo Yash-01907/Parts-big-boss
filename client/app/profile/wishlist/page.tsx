@@ -6,47 +6,7 @@ import { Heart, Tag } from "lucide-react";
 // Import the specific Wishlist Card
 import WishlistProductCard from "./wishlistCard";
 import { Product } from "../../types/product";
-
-// Mock Data
-const SAVED_ITEMS = {
-  "Hyundai Creta 1.6 SX": [
-    {
-      id: 101,
-      title: "Front Brake Pads - Bosch",
-      price: 185000,
-      part_number: "0986AB1054",
-      image_url: "/placeholder-brake.png",
-      category: "Brakes",
-      slug: "brake-pads-bosch",
-      rating: 4.5,
-      rating_count: 120,
-    },
-    {
-      id: 102,
-      title: "Cabin Air Filter - 3M",
-      price: 45000,
-      part_number: "3M-CAF-99",
-      image_url: "/placeholder-filter.png",
-      category: "Filters",
-      slug: "cabin-filter-3m",
-      rating: 4.2,
-      rating_count: 85,
-    },
-  ],
-  "Universal Parts": [
-    {
-      id: 201,
-      title: "Microfiber Cleaning Cloth (Pack of 3)",
-      price: 35000,
-      part_number: "MF-CL-03",
-      image_url: "/placeholder-cloth.png",
-      category: "Accessories",
-      slug: "microfiber-cloth-pack",
-      rating: 4.8,
-      rating_count: 450,
-    },
-  ],
-};
+import { useCartStore } from "@/app/store/useCartStore";
 
 const SUGGESTED_CATEGORIES = [
   "Engine Oil",
@@ -56,12 +16,12 @@ const SUGGESTED_CATEGORIES = [
 ];
 
 export default function WishlistPage() {
-  const hasItems = Object.keys(SAVED_ITEMS).length > 0;
+  const { items, removeItem } = useCartStore();
+  const hasItems = items.length > 0;
 
-  // Handler to sync removal with backend (optional for now)
+  // Handler to sync removal with backend
   const handleRemoveItem = (id: string | number) => {
-    console.log("Removing item from wishlist:", id);
-    // TODO: Call API to remove item
+    removeItem(Number(id));
   };
 
   return (
@@ -69,43 +29,34 @@ export default function WishlistPage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-[var(--foreground)]">
-          Saved Parts
+          My Cart Items
         </h1>
         <p className="text-[var(--text-secondary)]">
-          Your wishlist grouped by compatibility
+          Items currently in your cart
         </p>
       </div>
 
       {hasItems ? (
-        <div className="space-y-10">
-          {Object.entries(SAVED_ITEMS).map(
-            ([groupName, products], groupIndex) => (
-              <motion.div
-                key={groupName}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: groupIndex * 0.1 }}
-                className="space-y-4"
-              >
-                <h2 className="text-xl font-bold text-[var(--foreground)] flex items-center gap-2">
-                  <Tag size={20} className="text-[var(--accent)]" />
-                  For {groupName}
-                </h2>
-
-                {/* Wishlist Grid */}
-                <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
-                  {products.map((product) => (
-                    <WishlistProductCard
-                      key={product.id}
-                      // Cast mock data to Product type if needed, or ensure mock data matches interface
-                      product={product as unknown as Product}
-                      onRemove={handleRemoveItem}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            )
-          )}
+        <div className="space-y-4">
+          <div className="grid grid-rows-1 lg:grid-cols-1 gap-4">
+            {items.map((item) => (
+              <WishlistProductCard
+                key={item.productId}
+                product={{
+                  id: item.productId,
+                  title: item.title,
+                  price: item.price,
+                  part_number: "N/A", // Not available in cart item
+                  image_url: item.image,
+                  category: "Cart Item",
+                  slug: "", // Not available
+                  rating: 0,
+                  rating_count: 0,
+                }}
+                onRemove={handleRemoveItem}
+              />
+            ))}
+          </div>
         </div>
       ) : (
         /* Empty State */
@@ -118,11 +69,10 @@ export default function WishlistPage() {
             <Heart size={40} />
           </div>
           <h3 className="text-xl font-bold text-[var(--foreground)] mb-2">
-            Your wishlist is empty
+            Your cart is empty
           </h3>
           <p className="text-[var(--text-secondary)] max-w-xs mb-8">
-            Start saving parts for your dream build. Here are some popular
-            categories:
+            Start adding parts to your cart. Here are some popular categories:
           </p>
 
           <div className="flex flex-wrap justify-center gap-3">

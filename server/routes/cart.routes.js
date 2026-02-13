@@ -10,7 +10,7 @@ import {
 const router = Router();
 router.use(verifyJWT);
 router
-  .route("/cart")
+  .route("/")
   .get(getCart)
   .post(addToCart)
   .put(updateCart)
