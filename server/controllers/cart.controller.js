@@ -17,16 +17,25 @@ export const addToCart = asyncHandler(async (req, res) => {
   }
   const userId = req.user.id;
   const key = getCartKey(userId);
+  const productIdNum = Number(productId);
 
   let cart = await redisClient.get(key);
   cart = cart ? JSON.parse(cart) : [];
 
-  const itemIndex = cart.findIndex((item) => item.productId === productId);
+  const itemIndex = cart.findIndex(
+    (item) => Number(item.productId) === productIdNum,
+  );
 
   if (itemIndex > -1) {
     cart[itemIndex].quantity += Number(quantity);
   } else {
-    cart.push({ productId, quantity: Number(quantity), price, title, image });
+    cart.push({
+      productId: productIdNum,
+      quantity: Number(quantity),
+      price,
+      title,
+      image,
+    });
   }
 
   await redisClient.set(key, JSON.stringify(cart), "EX", 604800);
@@ -37,11 +46,14 @@ export const removeFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.body;
   const userId = req.user.id;
   const key = getCartKey(userId);
+  const productIdNum = Number(productId);
 
   let cart = await redisClient.get(key);
   cart = cart ? JSON.parse(cart) : [];
 
-  const itemIndex = cart.findIndex((item) => item.productId === productId);
+  const itemIndex = cart.findIndex(
+    (item) => Number(item.productId) === productIdNum,
+  );
 
   if (itemIndex > -1) {
     cart.splice(itemIndex, 1);
@@ -60,11 +72,14 @@ export const updateCart = asyncHandler(async (req, res) => {
 
   const userId = req.user.id;
   const key = getCartKey(userId);
+  const productIdNum = Number(productId);
 
   let cart = await redisClient.get(key);
   cart = cart ? JSON.parse(cart) : [];
 
-  const itemIndex = cart.findIndex((item) => item.productId === productId);
+  const itemIndex = cart.findIndex(
+    (item) => Number(item.productId) === productIdNum,
+  );
 
   if (itemIndex > -1) {
     cart[itemIndex].quantity = Number(quantity);

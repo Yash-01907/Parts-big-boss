@@ -7,7 +7,6 @@ import CustomerReviewSection from "./components/Sections/CustomerReviewSection";
 import CategoryGrid from "./components/Sections/CategoryGrid";
 import BrandMarquee from "./components/Sections/BrandMarquee";
 import Footer from "./components/Sections/Footer";
-import AuthInitializer from "./components/Sections/AuthIntialiser";
 
 // 1. Mark component as async to enable Server-Side Rendering
 export default async function Home() {
@@ -16,35 +15,34 @@ export default async function Home() {
 
   return (
     <>
-      
       <Navbar />
 
       <main className="w-full pb-20 bg-[var(--surface-hover)] min-h-screen">
         <HeroSlider />
 
         <div className="z-10 px-4">
-           {/* 4. Pass server-fetched data to the client component */}
-           <VehicleSelector initialMakes={initialMakes} variant="hero" />
+          {/* 4. Pass server-fetched data to the client component */}
+          <VehicleSelector initialMakes={initialMakes} variant="hero" />
         </div>
 
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12"> 
-           <FeaturedProductsSection />
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <FeaturedProductsSection />
         </section>
 
         <section>
-            <CustomerReviewSection />
+          <CustomerReviewSection />
         </section>
 
         <section>
-            <CategoryGrid />
+          <CategoryGrid />
         </section>
 
         <section>
-            <BrandMarquee />
+          <BrandMarquee />
         </section>
       </main>
 
-      <Footer/>
+      <Footer />
     </>
   );
 }

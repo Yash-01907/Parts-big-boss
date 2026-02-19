@@ -4,12 +4,11 @@ import asyncHandler from "../utils/asyncHandler.js";
 import { pool } from "../db/db.js";
 import redisClient from "../db/redisClient.js";
 import AppError from "../utils/appError.js";
-import { 
-  generateAccessToken, 
-  generateRefreshToken 
-} from "../utils/generateToken.js"; 
+import {
+  generateAccessToken,
+  generateRefreshToken,
+} from "../utils/generateToken.js";
 import { cookieOptions } from "../utils/cookieOptions.js";
-
 
 const sendTokenResponse = async (user, statusCode, res) => {
   const accessToken = generateAccessToken(user.id);
@@ -21,22 +20,25 @@ const sendTokenResponse = async (user, statusCode, res) => {
     role: user.role,
     is_verified: user.is_verified,
   };
-  
+
   await redisClient.set(
     `session:${user.id}`,
     JSON.stringify(sessionData),
     "EX",
-    3600 // 1 Hour
+    3600, // 1 Hour
   );
 
   await redisClient.set(
     `refresh_token:${refreshToken}`,
     user.id.toString(),
     "EX",
-    604800 // 7 Days (Must match token expiry)
+    604800, // 7 Days (Must match token expiry)
   );
 
-  res.cookie("_access", accessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 }); // 15 mins
+  res.cookie("_access", accessToken, {
+    ...cookieOptions,
+    maxAge: 15 * 60 * 1000,
+  }); // 15 mins
   res.cookie("_refresh", refreshToken, cookieOptions);
 
   res.status(statusCode).json({
@@ -49,27 +51,38 @@ const sendTokenResponse = async (user, statusCode, res) => {
       last_name: user.last_name,
       role: user.role,
       phone_number: user.phone_number,
-      dealer_profile: user.dealer_profile || null
+      dealer_profile: user.dealer_profile || null,
     },
   });
 };
 
-
-
-
-
 export const registerUser = asyncHandler(async (req, res) => {
-  const { 
-    email, phone_number, first_name, last_name, password, role,
-    company_name, vat_number, company_address, company_city
+  const {
+    email,
+    phone_number,
+    first_name,
+    last_name,
+    password,
+    role,
+    company_name,
+    vat_number,
+    company_address,
+    company_city,
   } = req.body;
 
   // 1. Validation
-  if (!email || !phone_number || !first_name || !last_name || !password || !role) {
+  if (
+    !email ||
+    !phone_number ||
+    !first_name ||
+    !last_name ||
+    !password ||
+    !role
+  ) {
     throw new AppError("All common fields are required", 400);
   }
 
-  const validRoles = ['customer', 'dealer'];
+  const validRoles = ["customer", "dealer"];
   if (!validRoles.includes(role)) {
     throw new AppError("Invalid role specified", 400);
   }
@@ -83,10 +96,13 @@ export const registerUser = asyncHandler(async (req, res) => {
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN'); // Start Transaction
+    await client.query("BEGIN"); // Start Transaction
 
     // 2. Check Exists
-    const userCheck = await client.query("SELECT id FROM users WHERE email = $1", [email]);
+    const userCheck = await client.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email],
+    );
     if (userCheck.rows.length > 0) {
       throw new AppError("Email already registered", 400);
     }
@@ -96,10 +112,15 @@ export const registerUser = asyncHandler(async (req, res) => {
     const userQuery = `
       INSERT INTO users (email, phone_number, first_name, last_name, password_hash, role) 
       VALUES ($1, $2, $3, $4, $5, $6) 
-      RETURNING id, email, first_name, last_name, role, phone_number, created_at`; 
-    
+      RETURNING id, email, first_name, last_name, role, phone_number, created_at`;
+
     const userResult = await client.query(userQuery, [
-      email, phone_number, first_name, last_name, hashedPassword, role
+      email,
+      phone_number,
+      first_name,
+      last_name,
+      hashedPassword,
+      role,
     ]);
     const newUser = userResult.rows[0];
 
@@ -109,25 +130,30 @@ export const registerUser = asyncHandler(async (req, res) => {
         INSERT INTO dealers (user_id, company_name, vat_number, company_address, company_city) 
         VALUES ($1, $2, $3, $4, $5) 
         RETURNING *`;
-      
+
       const dealerResult = await client.query(dealerQuery, [
-        newUser.id, company_name, vat_number, company_address, company_city
+        newUser.id,
+        company_name,
+        vat_number,
+        company_address,
+        company_city,
       ]);
       newUser.dealer_profile = dealerResult.rows[0];
     }
 
-    await client.query('COMMIT'); // Commit Transaction
+    await client.query("COMMIT"); // Commit Transaction
 
     // 5. Generate Tokens & Response
     await sendTokenResponse(newUser, 201, res);
-
   } catch (error) {
-    await client.query('ROLLBACK'); // Rollback on error
-    
+    await client.query("ROLLBACK"); // Rollback on error
+
     // Handle Postgres Unique Constraint Errors
-    if (error.code === '23505') { 
-      if (error.detail.includes('email')) throw new AppError("Email already exists", 400);
-      if (error.detail.includes('vat_number')) throw new AppError("VAT Number already registered", 400);
+    if (error.code === "23505") {
+      if (error.detail.includes("email"))
+        throw new AppError("Email already exists", 400);
+      if (error.detail.includes("vat_number"))
+        throw new AppError("VAT Number already registered", 400);
     }
     throw error;
   } finally {
@@ -145,14 +171,17 @@ export const loginUser = asyncHandler(async (req, res) => {
   const client = await pool.connect();
 
   try {
-    await client.query('BEGIN');
+    await client.query("BEGIN");
 
     // 1. Fetch User & Password Hash
-    const userCheck = await client.query("SELECT * FROM users WHERE email = $1", [email]);
+    const userCheck = await client.query(
+      "SELECT * FROM users WHERE email = $1",
+      [email],
+    );
     if (userCheck.rows.length === 0) {
       throw new AppError("Invalid email or password", 401);
     }
-    
+
     const user = userCheck.rows[0];
 
     // 2. Verify Password
@@ -163,17 +192,19 @@ export const loginUser = asyncHandler(async (req, res) => {
 
     // 3. Fetch Dealer Profile (if needed)
     if (user.role === "dealer") {
-      const dealerData = await client.query("SELECT * FROM dealers WHERE user_id = $1", [user.id]);
+      const dealerData = await client.query(
+        "SELECT * FROM dealers WHERE user_id = $1",
+        [user.id],
+      );
       user.dealer_profile = dealerData.rows[0];
     }
 
-    await client.query('COMMIT');
+    await client.query("COMMIT");
 
     // 4. Generate Tokens & Response
     await sendTokenResponse(user, 200, res);
-
   } catch (error) {
-    await client.query('ROLLBACK');
+    await client.query("ROLLBACK");
     throw error;
   } finally {
     client.release();
@@ -209,12 +240,15 @@ export const refreshAccessToken = asyncHandler(async (req, res) => {
   const newRefreshToken = generateRefreshToken(storedUserId);
 
   // 4. Send via Cookie and JSON
-  res.cookie("_access", newAccessToken, { ...cookieOptions, maxAge: 15 * 60 * 1000 });
+  res.cookie("_access", newAccessToken, {
+    ...cookieOptions,
+    maxAge: 15 * 60 * 1000,
+  });
   res.cookie("_refresh", newRefreshToken, cookieOptions);
-  
+
   res.status(200).json({
     status: "success",
-    accessToken: newAccessToken
+    accessToken: newAccessToken,
   });
 });
 
@@ -236,12 +270,195 @@ export const logoutUser = asyncHandler(async (req, res) => {
   res.clearCookie("_refresh", cookieOptions);
   res.clearCookie("_access", cookieOptions);
 
-  res.status(200).json({ status: "success", message: "Logged out successfully" });
+  res
+    .status(200)
+    .json({ status: "success", message: "Logged out successfully" });
 });
-
 
 export const getUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const user = await pool.query("SELECT id,email,first_name,last_name FROM users WHERE id = $1", [userId]);
+  const user = await pool.query(
+    "SELECT id,email,first_name,last_name FROM users WHERE id = $1",
+    [userId],
+  );
   res.status(200).json(user.rows[0]);
+});
+
+export const addAddress = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const {
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    country,
+    is_default,
+  } = req.body;
+
+  if (!address_line1 || !city || !state || !postal_code) {
+    throw new AppError(
+      "address_line1, city, state and postal_code are required",
+      400,
+    );
+  }
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // If this address should be default, clear other defaults for the user
+    if (is_default) {
+      await client.query(
+        "UPDATE user_addresses SET is_default = FALSE WHERE user_id = $1 AND is_default = TRUE",
+        [userId],
+      );
+    }
+
+    const insertSql = `
+      INSERT INTO user_addresses (
+        user_id, address_line1, address_line2, city, state, postal_code, country, is_default
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+      RETURNING *
+    `;
+
+    const result = await client.query(insertSql, [
+      userId,
+      address_line1,
+      address_line2 || null,
+      city,
+      state,
+      postal_code,
+      country || "India",
+      !!is_default,
+    ]);
+
+    await client.query("COMMIT");
+
+    res.status(201).json({ status: "success", data: result.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+});
+
+export const getAddresses = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const result = await pool.query(
+    "SELECT id, address_line1, address_line2, city, state, postal_code, country, is_default, created_at FROM user_addresses WHERE user_id = $1 ORDER BY created_at DESC",
+    [userId],
+  );
+
+  res.status(200).json({ status: "success", data: result.rows });
+});
+
+export const updateAddress = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const addressId = req.params.id;
+  const {
+    address_line1,
+    address_line2,
+    city,
+    state,
+    postal_code,
+    country,
+    is_default,
+  } = req.body;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Ensure address belongs to user
+    const owned = await client.query(
+      "SELECT id FROM user_addresses WHERE id = $1 AND user_id = $2",
+      [addressId, userId],
+    );
+    if (owned.rows.length === 0) throw new AppError("Address not found", 404);
+
+    if (is_default) {
+      await client.query(
+        "UPDATE user_addresses SET is_default = FALSE WHERE user_id = $1 AND is_default = TRUE",
+        [userId],
+      );
+    }
+
+    const upd = await client.query(
+      `UPDATE user_addresses SET
+        address_line1 = $1,
+        address_line2 = $2,
+        city = $3,
+        state = $4,
+        postal_code = $5,
+        country = $6,
+        is_default = $7
+      WHERE id = $8
+      RETURNING *`,
+      [
+        address_line1,
+        address_line2 || null,
+        city,
+        state,
+        postal_code,
+        country || "India",
+        !!is_default,
+        addressId,
+      ],
+    );
+
+    await client.query("COMMIT");
+
+    res.status(200).json({ status: "success", data: upd.rows[0] });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
+});
+
+export const deleteAddress = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const addressId = req.params.id;
+
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+
+    // Ensure ownership
+    const owned = await client.query(
+      "SELECT id, is_default FROM user_addresses WHERE id = $1 AND user_id = $2",
+      [addressId, userId],
+    );
+    if (owned.rows.length === 0) throw new AppError("Address not found", 404);
+
+    const wasDefault = owned.rows[0].is_default;
+
+    await client.query("DELETE FROM user_addresses WHERE id = $1", [addressId]);
+
+    if (wasDefault) {
+      // Promote the most recent address to default if any
+      const other = await client.query(
+        "SELECT id FROM user_addresses WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1",
+        [userId],
+      );
+      if (other.rows.length > 0) {
+        await client.query(
+          "UPDATE user_addresses SET is_default = TRUE WHERE id = $1",
+          [other.rows[0].id],
+        );
+      }
+    }
+
+    await client.query("COMMIT");
+
+    res.status(200).json({ status: "success", message: "Address deleted" });
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
+  }
 });

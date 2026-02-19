@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus,
   MapPin,
@@ -33,39 +33,37 @@ const addressSchema = z.object({
 
 type AddressFormValues = z.infer<typeof addressSchema>;
 
-// Mock Initial Data
-const INITIAL_ADDRESSES: AddressFormValues[] = [
-  {
-    id: "1",
-    label: "Home",
-    fullName: "John Doe",
-    phone: "+1 234 567 890",
-    streetAddress: "123 Main St, Apt 4B",
-    city: "New York",
-    state: "NY",
-    zipCode: "10001",
-    country: "USA",
-    isDefault: true,
-  },
-  {
-    id: "2",
-    label: "Work",
-    fullName: "John Doe",
-    phone: "+1 234 567 890",
-    streetAddress: "456 Corporate Blvd",
-    city: "New York",
-    state: "NY",
-    zipCode: "10022",
-    country: "USA",
-    isDefault: false,
-  },
-];
+import * as addressApi from "../../Data/addresses";
+
+// Start with empty list; we'll fetch from API
+const INITIAL_ADDRESSES: AddressFormValues[] = [];
 
 export default function AddressManager() {
   const [addresses, setAddresses] =
     useState<AddressFormValues[]>(INITIAL_ADDRESSES);
   const [isAdding, setIsAdding] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const rows = await addressApi.fetchAddresses();
+        if (mounted) setAddresses(rows);
+      } catch (err) {
+        // ignore; user can still manage local addresses
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Toggle Add/Edit Mode
   const handleAddNew = () => {
@@ -80,47 +78,91 @@ export default function AddressManager() {
 
   // Delete Address
   const handleDelete = (id: string) => {
-    if (confirm("Are you sure you want to delete this address?")) {
-      setAddresses((prev) => prev.filter((addr) => addr.id !== id));
-      toast.success("Address deleted");
-    }
+    if (!confirm("Are you sure you want to delete this address?")) return;
+    (async () => {
+      try {
+        await addressApi.deleteAddress(id);
+        setAddresses((prev) => prev.filter((addr) => addr.id !== id));
+        toast.success("Address deleted");
+      } catch (err) {
+        toast.error("Failed to delete address");
+      }
+    })();
   };
 
   // Set Default
   const handleSetDefault = (id: string) => {
-    setAddresses((prev) =>
-      prev.map((addr) => ({
-        ...addr,
-        isDefault: addr.id === id,
-      }))
-    );
-    toast.success("Default address updated");
+    (async () => {
+      try {
+        // Call update to set is_default
+        await addressApi.updateAddress(id, { is_default: true });
+        setAddresses((prev) =>
+          prev.map((addr) => ({ ...addr, isDefault: addr.id === id })),
+        );
+        toast.success("Default address updated");
+      } catch (err) {
+        toast.error("Failed to update default");
+      }
+    })();
   };
 
   // Save (Add/Update)
   const handleSave = (data: AddressFormValues) => {
-    if (editingId) {
-      // Update
-      setAddresses((prev) =>
-        prev.map((addr) =>
-          addr.id === editingId ? { ...data, id: editingId } : addr
-        )
-      );
-      toast.success("Address updated successfully");
-    } else {
-      // Add
-      const newAddress = {
-        ...data,
-        id: Math.random().toString(36).substr(2, 9),
-      };
-      // If it's the first address, make it default
-      if (addresses.length === 0) newAddress.isDefault = true;
-
-      setAddresses((prev) => [...prev, newAddress]);
-      toast.success("Address added successfully");
-    }
-    setIsAdding(false);
-    setEditingId(null);
+    (async () => {
+      try {
+        if (editingId) {
+          const payload = {
+            address_line1: data.streetAddress,
+            address_line2: "",
+            city: data.city,
+            state: data.state,
+            postal_code: data.zipCode,
+            country: data.country,
+            is_default: !!data.isDefault,
+          };
+          const r = await addressApi.updateAddress(editingId, payload);
+          setAddresses((prev) =>
+            prev.map((addr) =>
+              addr.id === editingId
+                ? {
+                    ...data,
+                    id: editingId,
+                    streetAddress:
+                      r.address_line1 +
+                      (r.address_line2 ? ", " + r.address_line2 : ""),
+                    isDefault: !!r.is_default,
+                  }
+                : addr,
+            ),
+          );
+          toast.success("Address updated successfully");
+        } else {
+          const payload = {
+            address_line1: data.streetAddress,
+            address_line2: "",
+            city: data.city,
+            state: data.state,
+            postal_code: data.zipCode,
+            country: data.country,
+            is_default: !!data.isDefault,
+          };
+          const r = await addressApi.addAddress(payload);
+          const newAddress: AddressFormValues = {
+            ...data,
+            id: String(r.id),
+            streetAddress:
+              r.address_line1 + (r.address_line2 ? ", " + r.address_line2 : ""),
+            isDefault: !!r.is_default,
+          };
+          setAddresses((prev) => [...prev, newAddress]);
+          toast.success("Address added successfully");
+        }
+        setIsAdding(false);
+        setEditingId(null);
+      } catch (err) {
+        toast.error("Failed to save address");
+      }
+    })();
   };
 
   return (
@@ -160,15 +202,19 @@ export default function AddressManager() {
             exit={{ opacity: 0 }}
             className="flex flex-col gap-4"
           >
-            {addresses.map((addr) => (
-              <AddressCard
-                key={addr.id}
-                address={addr}
-                onEdit={() => handleEdit(addr)}
-                onDelete={() => handleDelete(addr.id!)}
-                onSetDefault={() => handleSetDefault(addr.id!)}
-              />
-            ))}
+            {loading ? (
+              <div className="text-sm text-gray-500">Loading addresses...</div>
+            ) : (
+              addresses.map((addr, idx) => (
+                <AddressCard
+                  key={`${addr.id ?? "addr"}-${idx}`}
+                  address={addr}
+                  onEdit={() => handleEdit(addr)}
+                  onDelete={() => handleDelete(addr.id!)}
+                  onSetDefault={() => handleSetDefault(addr.id!)}
+                />
+              ))
+            )}
           </motion.div>
         )}
       </AnimatePresence>

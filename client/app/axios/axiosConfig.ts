@@ -31,10 +31,11 @@ api.interceptors.response.use(
         // If refresh successful, retry original request with the api instance
         return api(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, redirect to login
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
+        // If refresh fails, we propagate the error so components can handle it
+        // Do NOT force redirect here as it causes loops with global AuthInitializer
+        // if (typeof window !== "undefined") {
+        //   window.location.href = "/login";
+        // }
         return Promise.reject(refreshError);
       }
     }

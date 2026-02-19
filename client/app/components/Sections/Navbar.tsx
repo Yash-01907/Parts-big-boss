@@ -69,22 +69,18 @@ export default function Navbar() {
             </div>
 
             {/* Mobile actions */}
-            <div className="flex lg:hidden items-center gap-2">
+            <div className="flex lg:hidden items-center">
               <SearchBar />
-              <CartButton />
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
                 className="
-                  inline-flex items-center justify-center
-                  rounded-lg p-2
-                  text-white
-                  transition-colors
-                  hover:text-white
-                  hover:bg-[var(--surface-hover)]
+                bg-transparent
+                text-white   
+                p-2
                 "
-                aria-label="Open menu"
+                aria-label=""
               >
-                <Menu size={20} />
+                <Menu size={24} />
               </button>
             </div>
           </div>

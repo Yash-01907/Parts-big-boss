@@ -36,7 +36,29 @@ export const cartStore = {
     try {
       const response = await api.get(CART_API_URL);
       // Ensure we always have an array
-      const items = Array.isArray(response.data) ? response.data : [];
+      const rawItems = Array.isArray(response.data) ? response.data : [];
+
+      // Deduplicate items to prevent key collisions
+      const uniqueItemsMap = new Map<number, CartItem>();
+
+      rawItems.forEach((item: any) => {
+        const pId = Number(item.productId);
+        if (!pId) return; // Skip if no valid ID
+
+        if (uniqueItemsMap.has(pId)) {
+          const existing = uniqueItemsMap.get(pId)!;
+          // Merge quantities
+          existing.quantity += Number(item.quantity || 0);
+        } else {
+          uniqueItemsMap.set(pId, {
+            ...item,
+            productId: pId,
+            quantity: Number(item.quantity || 0),
+          });
+        }
+      });
+
+      const items = Array.from(uniqueItemsMap.values());
       cartState = { ...cartState, items, isLoading: false };
     } catch (error: any) {
       console.error("Failed to fetch cart:", error);
@@ -167,5 +189,5 @@ export function useCartTotal() {
 
 export function useCartCount() {
   const state = useCartStore();
-  return state.items.reduce((count, item) => count + item.quantity, 0);
+  return state.items.length;
 }

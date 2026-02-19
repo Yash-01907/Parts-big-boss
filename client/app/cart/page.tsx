@@ -5,6 +5,7 @@ import Breadcrumbs from "../components/product-components/Breadcrumbs";
 import CartItemsList from "./CartItemsList";
 import CartOrderSummary from "./CartOrderSummary";
 import RelatedProducts from "./RelatedProducts";
+import CheckoutSection from "./components/CheckoutSection";
 
 export default function CartPage() {
   return (
@@ -24,6 +25,10 @@ export default function CartPage() {
               Shopping Cart
             </h1>
             <CartItemsList />
+
+            <div className="mt-8 pt-8">
+              <CheckoutSection />
+            </div>
           </div>
 
           {/* Sidebar Area */}

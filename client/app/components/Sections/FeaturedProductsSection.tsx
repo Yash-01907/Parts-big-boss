@@ -54,7 +54,7 @@ export default function FeaturedProductsSection() {
   const totalPages = Math.ceil(displayProducts.length / itemsPerPage);
   const currentProducts = displayProducts.slice(
     currentIndex * itemsPerPage,
-    (currentIndex + 1) * itemsPerPage
+    (currentIndex + 1) * itemsPerPage,
   );
 
   const handleDotClick = (index: number) => {
@@ -102,7 +102,7 @@ export default function FeaturedProductsSection() {
                   id={product.id.toString()}
                   name={product.title}
                   partNumber={product.part_number}
-                  price={product.price}
+                  price={product.price / 100}
                   image={null}
                   rating={3.2}
                   reviewCount={1406}
