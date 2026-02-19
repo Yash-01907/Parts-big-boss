@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, MapPin } from "lucide-react";
 import { toast } from "sonner";
 import * as addressApi from "../../Data/addresses";
+import CheckoutButton from "../../components/CheckoutButton";
 
 // No dummy addresses: always fetch from API or show add form
 
@@ -152,54 +153,66 @@ export default function CheckoutSection() {
         Delivery Details
       </h2>
 
-      {/* Mobile Flow (Animated) */}
-      <div className="md:hidden overflow-hidden relative min-h-[400px]">
-        <AnimatePresence mode="popLayout">
-          {step === "auth" && !isAuthenticated && !isGuestVerified && (
-            <motion.div
-              key="auth"
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <PhoneVerification onVerified={handleGuestVerified} />
-            </motion.div>
-          )}
+      <div className="flex flex-col gap-4">
+        {/* Mobile Flow (Animated) */}
+        <div className="md:hidden overflow-hidden relative min-h-[400px]">
+          <AnimatePresence mode="popLayout">
+            {step === "auth" && !isAuthenticated && !isGuestVerified && (
+              <motion.div
+                key="auth"
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <PhoneVerification onVerified={handleGuestVerified} />
+              </motion.div>
+            )}
 
-          {step === "address" && (
-            <motion.div
-              key="address"
-              initial={{ x: 300, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              <AddressContent
-                addresses={addresses}
-                selectedAddressId={selectedAddressId}
-                setSelectedAddressId={setSelectedAddressId}
-                showAddAddress={showAddAddress}
-                setShowAddAddress={setShowAddAddress}
-                handleAddressSubmit={handleAddressSubmit}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+            {step === "address" && (
+              <motion.div
+                key="address"
+                initial={{ x: 300, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -300, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <div className="pb-20">
+                  <AddressContent
+                    addresses={addresses}
+                    selectedAddressId={selectedAddressId}
+                    setSelectedAddressId={setSelectedAddressId}
+                    showAddAddress={showAddAddress}
+                    setShowAddAddress={setShowAddAddress}
+                    handleAddressSubmit={handleAddressSubmit}
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
 
-      {/* Desktop Flow (Simple Vertical) */}
-      <div className="hidden md:block">
-        {!isAuthenticated && !isGuestVerified ? (
-          <PhoneVerification onVerified={handleGuestVerified} />
-        ) : (
-          <AddressContent
-            addresses={addresses}
-            selectedAddressId={selectedAddressId}
-            setSelectedAddressId={setSelectedAddressId}
-            showAddAddress={showAddAddress}
-            setShowAddAddress={setShowAddAddress}
-            handleAddressSubmit={handleAddressSubmit}
+        {/* Desktop Flow (Simple Vertical) */}
+        <div className="hidden md:block">
+          {!isAuthenticated && !isGuestVerified ? (
+            <PhoneVerification onVerified={handleGuestVerified} />
+          ) : (
+            <AddressContent
+              addresses={addresses}
+              selectedAddressId={selectedAddressId}
+              setSelectedAddressId={setSelectedAddressId}
+              showAddAddress={showAddAddress}
+              setShowAddAddress={setShowAddAddress}
+              handleAddressSubmit={handleAddressSubmit}
+            />
+          )}
+        </div>
+
+        {/* Checkout Button Integration */}
+        {(step === "address" || step === "payment") && !showAddAddress && (
+          <CheckoutButton
+            addressId={selectedAddressId}
+            disabled={!selectedAddressId}
           />
         )}
       </div>

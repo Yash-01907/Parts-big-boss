@@ -12,7 +12,7 @@ app.use(
   cors({
     origin: "http://localhost:3001",
     credentials: true,
-  })
+  }),
 );
 app.use(express.json());
 app.use(cookieParser());
@@ -26,6 +26,7 @@ import userRoutes from "./routes/user.routes.js";
 import cartRoutes from "./routes/cart.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import userVehicleRoutes from "./routes/userVehicle.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
 
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/products", productRoutes);
@@ -33,6 +34,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/user/vehicles", userVehicleRoutes);
+app.use("/api/payment", paymentRoutes);
 
 // Error handling middleware
 app.use(errorHandler);
