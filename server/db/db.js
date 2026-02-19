@@ -10,7 +10,7 @@ export async function dbconnect() {
   try {
     const client = await pool.connect();
     const res = await client.query("SELECT version()");
-    console.log("Connected to:", res.rows[0].version); // This will tell you the answer!
+    console.log("Connected to:", res.rows[0].version);
     client.release();
   } catch (err) {
     console.error("Database connection error:", err);

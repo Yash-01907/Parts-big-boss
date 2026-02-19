@@ -23,9 +23,9 @@ api.interceptors.response.use(
         // Attempt to refresh token
         // We use the base axios instance to avoid infinite loops with the interceptor
         await axios.post(
-          `${API_BASE_URL}/api/users/refresh-token`,
+          `${API_BASE_URL}/api/users/refresh`,
           {},
-          { withCredentials: true }
+          { withCredentials: true },
         );
 
         // If refresh successful, retry original request with the api instance
@@ -40,5 +40,5 @@ api.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );

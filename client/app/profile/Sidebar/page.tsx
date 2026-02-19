@@ -15,6 +15,8 @@ import {
   ArrowLeft,
   Menu,
   X,
+  Home,
+  ChevronDown,
 } from "lucide-react";
 import { toast } from "sonner";
 import { logoutUser } from "@/app/Data/authLoginInfo";
@@ -23,7 +25,7 @@ import { authStore } from "@/app/store/useAuthStore";
 export default function ProfileSidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isHorizontalOpen, setIsHorizontalOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -42,7 +44,6 @@ export default function ProfileSidebar() {
   const menuItems = [
     { href: "/profile", label: "Dashboard", icon: LayoutDashboard },
     { href: "/profile/garage", label: "Garage", icon: Car },
-    { href: "/profile/wishlist", label: "Wishlist", icon: Heart },
     { href: "/profile/orders", label: "Orders", icon: Package },
     { href: "/profile/settings", label: "Settings", icon: Settings },
   ];
@@ -55,64 +56,110 @@ export default function ProfileSidebar() {
   return (
     <>
       {/* ================= MOBILE VIEW (< md) ================= */}
-      <div className="md:hidden sticky top-0 z-30 w-full bg-black text-white p-4 shadow-lg transition-all duration-300">
-        <div className="flex items-center justify-between">
-          {/* LEFT: Back to Home */}
-          <Link
-            href="/"
-            className="p-2 -ml-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
-          >
-            <ArrowLeft size={24} />
-          </Link>
-
-          {/* CENTER: Active Section Label */}
-          <span className="font-bold text-lg tracking-wide uppercase text-white">
-            {activeItem.label}
-          </span>
-
-          {/* RIGHT: Hamburger/Close Menu */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 -mr-2 hover:bg-white/10 rounded-full transition-colors text-white/80 hover:text-white"
-            aria-label="Toggle profile menu"
-          >
-            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Dropdown Options */}
-        {isMobileMenuOpen && (
-          <nav className="mt-4 pt-4 border-t border-white/10 flex flex-col gap-2 animate-in slide-in-from-top-2 fade-in duration-200">
-            {menuItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-                    ${
-                      isActive
-                        ? "bg-[var(--accent)] text-white font-bold"
-                        : "text-white/70 hover:text-white hover:bg-white/10"
-                    }
-                  `}
-                >
-                  <item.icon size={20} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
+      <div className="md:hidden">
+        {/* Top Bar - Sticky Header */}
+        <div className="sticky top-0 z-50 bg-gradient-to-r from-blue-600 to-purple-600 backdrop-blur-lg border-b border-white/10 shadow-lg">
+          <div className="flex items-center justify-between px-4 py-3">
+            {/* Left: Back to Home */}
             <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-3 rounded-xl text-red-400 hover:bg-white/5 transition-all w-full text-left mt-2"
+              onClick={() => router.push("/")}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-200 text-white/90 hover:text-white group"
+              aria-label="Back to home"
             >
-              <LogOut size={20} />
-              <span>Sign Out</span>
+              <Home className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium">Home</span>
             </button>
-          </nav>
-        )}
+
+            {/* Center: Active Section with Dropdown Indicator */}
+            <div className="flex items-center gap-2 px-4 py-2 bg-white/10 rounded-lg backdrop-blur-sm">
+              <span className="text-white font-semibold text-sm truncate max-w-[120px]">
+                {activeItem.label}
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 text-white/70 transition-transform duration-300 ${
+                  isHorizontalOpen ? "rotate-180" : ""
+                }`}
+              />
+            </div>
+
+            {/* Right: Menu Toggle */}
+            <button
+              onClick={() => setIsHorizontalOpen(!isHorizontalOpen)}
+              className="p-2.5 rounded-lg hover:bg-white/10 transition-all duration-200 text-white/90 hover:text-white relative group"
+              aria-label={isHorizontalOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isHorizontalOpen}
+            >
+              <div className="relative w-6 h-6">
+                <Menu
+                  className={`absolute inset-0 transition-all duration-300 ${
+                    isHorizontalOpen
+                      ? "opacity-0 rotate-90 scale-0"
+                      : "opacity-100 rotate-0 scale-100"
+                  }`}
+                />
+                <X
+                  className={`absolute inset-0 transition-all duration-300 ${
+                    isHorizontalOpen
+                      ? "opacity-100 rotate-0 scale-100"
+                      : "opacity-0 -rotate-90 scale-0"
+                  }`}
+                />
+              </div>
+            </button>
+          </div>
+
+          {/* Dropdown Menu with Smooth Animation */}
+          <div
+            className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isHorizontalOpen
+                ? "max-h-[500px] opacity-100"
+                : "max-h-0 opacity-0"
+            }`}
+          >
+            <div className="px-4 pb-4 pt-2 space-y-1 bg-gradient-to-b from-transparent to-black/10">
+              {menuItems.map((item, index) => {
+                const isActive = pathname === item.href;
+                return (
+                  <button
+                    key={item.href}
+                    onClick={() => {
+                      router.push(item.href);
+                      setIsHorizontalOpen(false);
+                    }}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 transform hover:scale-[1.02] ${
+                      isActive
+                        ? "bg-white text-blue-600 font-semibold shadow-lg"
+                        : "text-white/80 hover:text-white hover:bg-white/15 active:bg-white/20"
+                    }`}
+                    style={{
+                      animationDelay: `${index * 50}ms`,
+                      animation: isHorizontalOpen
+                        ? "slideIn 0.3s ease-out forwards"
+                        : "none",
+                    }}
+                  >
+                    {item.icon && <item.icon className="w-5 h-5" />}
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {isActive && (
+                      <div className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
+                    )}
+                  </button>
+                );
+              })}
+
+              {/* Sign Out Button */}
+              <div className="pt-2 mt-2 border-t border-white/10">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-red-100 hover:text-white hover:bg-red-500/20 transition-all duration-200 group"
+                >
+                  <LogOut className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="flex-1 text-left font-medium">Sign Out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* ================= DESKTOP VIEW (>= md) ================= */}

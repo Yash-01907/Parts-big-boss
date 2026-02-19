@@ -16,8 +16,6 @@ export default async function Home() {
 
   return (
     <>
-      {/* 3. Client-side logic runs here */}
-      <AuthInitializer /> 
       
       <Navbar />
 
