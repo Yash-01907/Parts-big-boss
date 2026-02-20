@@ -1,11 +1,17 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import { useCartStore, useCartTotal } from "../store/useCartStore";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import CheckoutButton from "../components/CheckoutButton";
 
-export default function CartOrderSummary() {
+interface CartOrderSummaryProps {
+  selectedAddressId: string | null;
+  canCheckout: boolean;
+}
+
+export default function CartOrderSummary({
+  selectedAddressId,
+  canCheckout,
+}: CartOrderSummaryProps) {
   const total = useCartTotal();
   const { items } = useCartStore();
   const [mounted, setMounted] = useState(false);
@@ -56,12 +62,7 @@ export default function CartOrderSummary() {
         </div>
       </dl>
 
-      <button
-        type="button"
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-black px-6 py-4 text-base font-bold text-white shadow-sm hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 transition-all active:scale-[0.98]"
-      >
-        Checkout <ArrowRight size={18} />
-      </button>
+      <CheckoutButton addressId={selectedAddressId} disabled={!canCheckout} />
 
       <p className="mt-4 text-center text-xs text-zinc-500">
         Shipping & taxes calculated at checkout

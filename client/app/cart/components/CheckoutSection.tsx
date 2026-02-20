@@ -1,132 +1,36 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import PhoneVerification from "./PhoneVerification";
 import AddressForm, { AddressData } from "./AddressForm";
 import { Address } from "../../types/address";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Plus, MapPin } from "lucide-react";
-import { toast } from "sonner";
-import * as addressApi from "../../Data/addresses";
-import CheckoutButton from "../../components/CheckoutButton";
 
-// No dummy addresses: always fetch from API or show add form
+interface CheckoutSectionProps {
+  step: "auth" | "address" | "payment";
+  isGuestVerified: boolean;
+  onGuestVerified: (phone: string) => void;
+  addresses: Address[];
+  selectedAddressId: string | null;
+  onSelectAddress: (id: string) => void;
+  showAddAddress: boolean;
+  setShowAddAddress: (show: boolean) => void;
+  onAddressSubmit: (data: AddressData) => void;
+}
 
-export default function CheckoutSection() {
-  const { isAuthenticated, user } = useAuthStore();
-
-  // Steps: 'auth' -> 'address' -> 'payment' (not implemented yet)
-  const [step, setStep] = useState<"auth" | "address" | "payment">("auth");
-
-  // Custom auth state for guest checkout flow
-  const [isGuestVerified, setIsGuestVerified] = useState(false);
-  const [guestPhone, setGuestPhone] = useState("");
-
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
-    null,
-  );
-  const [showAddAddress, setShowAddAddress] = useState(false);
-
-  // Initialize
-  useEffect(() => {
-    if (isAuthenticated) {
-      setStep("address");
-      // Fetch user's saved addresses
-      (async () => {
-        try {
-          const rows = await addressApi.fetchAddresses();
-          // Map to cart Address shape
-          const mapped: Address[] = rows.map((r: any) => ({
-            id: r.id,
-            fullName: r.fullName || "",
-            phone: r.phone || "",
-            streetAddress: r.streetAddress,
-            city: r.city || "",
-            state: r.state || "",
-            zipCode: r.zipCode || "",
-            type: "Home",
-            isDefault: r.isDefault,
-          }));
-          setAddresses(mapped);
-          if (mapped.length > 0) {
-            setSelectedAddressId(mapped[0].id!);
-            setShowAddAddress(false);
-          } else {
-            setShowAddAddress(true);
-          }
-        } catch (err) {
-          setAddresses([]);
-          setShowAddAddress(true);
-        }
-      })();
-    } else {
-      setStep("auth");
-    }
-  }, [isAuthenticated]);
-
-  const handleGuestVerified = (phone: string) => {
-    setGuestPhone(phone);
-    setIsGuestVerified(true);
-    setStep("address");
-    toast.success("Login verified!");
-  };
-
-  const handleAddressSubmit = (data: AddressData) => {
-    // If user is authenticated, persist address via API
-    (async () => {
-      try {
-        if (isAuthenticated) {
-          const payload = {
-            address_line1: data.addressLine1,
-            address_line2: data.addressLine2 || "",
-            city: data.city,
-            state: data.state,
-            postal_code: data.pincode,
-            country: "India",
-            is_default: false,
-          };
-          const res = await addressApi.addAddress(payload);
-          const newAddress: Address = {
-            id: String(res.id),
-            fullName: data.fullName,
-            phone: data.phone,
-            streetAddress:
-              res.address_line1 +
-              (res.address_line2 ? ", " + res.address_line2 : ""),
-            city: res.city || data.city,
-            state: res.state || data.state,
-            zipCode: res.postal_code || data.pincode,
-            type: data.type,
-            isDefault: !!res.is_default,
-          };
-          setAddresses((prev) => [...prev, newAddress]);
-          setSelectedAddressId(newAddress.id!);
-          setShowAddAddress(false);
-          toast.success("Address saved successfully");
-        } else {
-          // Guest: keep address locally
-          const newAddress: Address = {
-            id: Math.random().toString(36).substr(2, 9),
-            fullName: data.fullName,
-            phone: data.phone,
-            streetAddress: `${data.addressLine1} ${data.addressLine2 || ""}`,
-            city: data.city,
-            state: data.state,
-            zipCode: data.pincode,
-            type: data.type,
-          };
-          setAddresses([...addresses, newAddress]);
-          setSelectedAddressId(newAddress.id!);
-          setShowAddAddress(false);
-          toast.success("Address saved successfully");
-        }
-      } catch (err) {
-        toast.error("Failed to save address");
-      }
-    })();
-  };
+export default function CheckoutSection({
+  step,
+  isGuestVerified,
+  onGuestVerified,
+  addresses,
+  selectedAddressId,
+  onSelectAddress,
+  showAddAddress,
+  setShowAddAddress,
+  onAddressSubmit,
+}: CheckoutSectionProps) {
+  const { isAuthenticated } = useAuthStore();
 
   // Animation variants
   const slideVariants = {
@@ -165,7 +69,7 @@ export default function CheckoutSection() {
                 exit={{ x: -300, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <PhoneVerification onVerified={handleGuestVerified} />
+                <PhoneVerification onVerified={onGuestVerified} />
               </motion.div>
             )}
 
@@ -181,10 +85,10 @@ export default function CheckoutSection() {
                   <AddressContent
                     addresses={addresses}
                     selectedAddressId={selectedAddressId}
-                    setSelectedAddressId={setSelectedAddressId}
+                    setSelectedAddressId={onSelectAddress}
                     showAddAddress={showAddAddress}
                     setShowAddAddress={setShowAddAddress}
-                    handleAddressSubmit={handleAddressSubmit}
+                    handleAddressSubmit={onAddressSubmit}
                   />
                 </div>
               </motion.div>
@@ -195,26 +99,18 @@ export default function CheckoutSection() {
         {/* Desktop Flow (Simple Vertical) */}
         <div className="hidden md:block">
           {!isAuthenticated && !isGuestVerified ? (
-            <PhoneVerification onVerified={handleGuestVerified} />
+            <PhoneVerification onVerified={onGuestVerified} />
           ) : (
             <AddressContent
               addresses={addresses}
               selectedAddressId={selectedAddressId}
-              setSelectedAddressId={setSelectedAddressId}
+              setSelectedAddressId={onSelectAddress}
               showAddAddress={showAddAddress}
               setShowAddAddress={setShowAddAddress}
-              handleAddressSubmit={handleAddressSubmit}
+              handleAddressSubmit={onAddressSubmit}
             />
           )}
         </div>
-
-        {/* Checkout Button Integration */}
-        {(step === "address" || step === "payment") && !showAddAddress && (
-          <CheckoutButton
-            addressId={selectedAddressId}
-            disabled={!selectedAddressId}
-          />
-        )}
       </div>
     </div>
   );
