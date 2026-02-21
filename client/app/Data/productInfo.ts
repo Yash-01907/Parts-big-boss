@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Product } from "../types/product";
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 export const fetchFeaturedProducts = async (): Promise<Product[]> => {
   try {

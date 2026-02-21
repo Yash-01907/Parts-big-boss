@@ -15,7 +15,7 @@ import Breadcrumbs from "@/app/components/product-components/Breadcrumbs";
 async function getProduct(slug: string): Promise<ProductDetail | null> {
   console.log(slug);
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     const response = await fetch(`${API_URL}/api/products/${slug}`, {
       cache: "no-store",
       next: { revalidate: 3600 }, // Revalidate every hour

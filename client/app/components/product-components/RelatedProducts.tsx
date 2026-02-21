@@ -9,10 +9,10 @@ interface RelatedProductsProps {
 
 async function getRelatedProducts(
   categorySlug?: string,
-  currentProductId?: number
+  currentProductId?: number,
 ): Promise<Product[]> {
   try {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     const params = new URLSearchParams();
 
     if (categorySlug) {
@@ -25,7 +25,7 @@ async function getRelatedProducts(
       {
         cache: "no-store",
         next: { revalidate: 3600 },
-      }
+      },
     );
 
     if (!response.ok) {

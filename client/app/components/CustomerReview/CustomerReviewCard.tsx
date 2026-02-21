@@ -1,4 +1,4 @@
-"use client";
+
 
 import { Star, CheckCircle } from "lucide-react";
 import { CustomerReviewCardProps } from "../../types/reviewCardProp";

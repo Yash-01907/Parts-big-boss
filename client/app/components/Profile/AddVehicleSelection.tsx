@@ -18,11 +18,9 @@ export default function AddVehicleSection() {
       };
       console.log(payload);
       await axios.post(
-        `${
-          process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
-        }/api/user/vehicles`,
+        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"}/api/user/vehicles`,
         payload,
-        { withCredentials: true }
+        { withCredentials: true },
       );
 
       toast.success("Vehicle added successfully!");

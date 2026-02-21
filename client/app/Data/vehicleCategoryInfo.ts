@@ -2,10 +2,10 @@
 import axios from "axios";
 import { Make, Model } from "../types/vehicle";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 class VehicleCategoryService {
-  // We store data here. 
+  // We store data here.
   // It starts small and only grows if the user clicks many different cars.
   private makes: Make[] | null = null;
   private models: Record<number, Model[]> = {}; // Stores models by Make ID
@@ -17,7 +17,9 @@ class VehicleCategoryService {
 
     // 2. If not, fetch it from the backend
     try {
-      const response = await axios.get<Make[]>(`${API_URL}/api/vehicles/companies`);
+      const response = await axios.get<Make[]>(
+        `${API_URL}/api/vehicles/companies`,
+      );
       this.makes = response.data;
       return this.makes;
     } catch (error) {
@@ -33,7 +35,7 @@ class VehicleCategoryService {
     // 2. If not, fetch only this make's models
     try {
       const response = await axios.get<Model[]>(
-        `${API_URL}/api/vehicles/models/${makeId}`
+        `${API_URL}/api/vehicles/models/${makeId}`,
       );
       this.models[makeId] = response.data;
       return this.models[makeId];
@@ -51,7 +53,7 @@ class VehicleCategoryService {
     // 2. If not, fetch only this model's years
     try {
       const response = await axios.get<any[]>(
-        `${API_URL}/api/vehicles/years/${modelId}`
+        `${API_URL}/api/vehicles/years/${modelId}`,
       );
       console.log(response);
       this.years[modelId] = response.data;
